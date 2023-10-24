@@ -6,9 +6,9 @@
       "DOM.Iterable",
       "ESNext"
     ],
-    // "types": [
-    //   "vite/client"
-    // ],
+    "types": [
+      "vite/client"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": false,
@@ -24,7 +24,6 @@
     "baseUrl": "."
   },
   "include": [
-    "./frontend"
+    "src/frontend"
   ]
 }
-

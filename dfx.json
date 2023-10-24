@@ -1,17 +1,23 @@
 {
     "canisters": {
-        "backend": {
+        "artconnect": {
             "type": "custom",
-            "main": "canisters/main.ts",
-            "candid": "canisters/main.did",
-            "wasm": "./azle/ArtConnect/ArtConnect.wasm.gz"
+            "main": "src/backend/index.ts",
+            "candid": "src/backend/index.did",
+            "build": "npx azle artconnect",
+            "wasm": ".azle/artconnect/artconnect.wasm",
+            "gzip": true,
+            "declarations": {
+                "node_compatibility": true,
+                "env_override": ""
+            }
         },
         "assets": {
-            "dependencies": ["counter"],
+            "dependencies": ["artconnect"],
             "frontend": {
                 "entrypoint": "dist/index.html"
             },
-            "source": ["dist/"],
+            "source": ["src/frontend/assets", "dist/assets"],
             "type": "assets"
         }
     },
@@ -22,7 +28,7 @@
     },
     "networks": {
         "local": {
-            "bind": "127.0.0.1:8000",
+            "bind": "127.0.0.1:4943",
             "type": "ephemeral"
         },
         "ic": {
@@ -32,4 +38,3 @@
     },
     "version": 1
 }
-

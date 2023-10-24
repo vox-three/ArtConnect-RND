@@ -1,0 +1,22 @@
+service: () -> {
+    createCreator: (text, text, text, text) -> (record {id:principal; nftIds:vec nat64; flickr:text; instagram:text; createdAt:nat64; behance:text; reddit:text});
+    createMerchant: () -> (record {slotIds:vec nat64; collabCreators:vec principal; createdAt:nat64; uuid:text});
+    createNft: (principal, text, text) -> (record {id:nat64; imageMetadata:text; createdAt:nat64; creatorId:principal; imageUrl:text});
+    createSlot: (nat64, principal, text, nat64) -> (record {id:nat64; userId:principal; createdAt:nat64; merchantId:text; claimed:bool; nftId:nat64});
+    createUser: (principal) -> (record {id:principal; nftIds:vec nat64; slotIds:vec nat64; createdAt:nat64});
+    deleteCreator: (principal) -> (variant {Ok:record {id:principal; nftIds:vec nat64; flickr:text; instagram:text; createdAt:nat64; behance:text; reddit:text}; Err:variant {MerchantDoesNotExist:text; SlotDoesNotExist:nat64; NftDoesNotExist:nat64; CreatorDoesNotExist:principal; UserDoesNotExist:principal}});
+    deleteMerchant: (text) -> (variant {Ok:record {slotIds:vec nat64; collabCreators:vec principal; createdAt:nat64; uuid:text}; Err:variant {MerchantDoesNotExist:text; SlotDoesNotExist:nat64; NftDoesNotExist:nat64; CreatorDoesNotExist:principal; UserDoesNotExist:principal}});
+    deleteNft: (nat64) -> (variant {Ok:record {id:nat64; imageMetadata:text; createdAt:nat64; creatorId:principal; imageUrl:text}; Err:variant {MerchantDoesNotExist:text; SlotDoesNotExist:nat64; NftDoesNotExist:nat64; CreatorDoesNotExist:principal; UserDoesNotExist:principal}});
+    deleteSlot: (nat64) -> (variant {Ok:record {id:nat64; userId:principal; createdAt:nat64; merchantId:text; claimed:bool; nftId:nat64}; Err:variant {MerchantDoesNotExist:text; SlotDoesNotExist:nat64; NftDoesNotExist:nat64; CreatorDoesNotExist:principal; UserDoesNotExist:principal}});
+    deleteUser: (principal) -> (variant {Ok:record {id:principal; nftIds:vec nat64; slotIds:vec nat64; createdAt:nat64}; Err:variant {MerchantDoesNotExist:text; SlotDoesNotExist:nat64; NftDoesNotExist:nat64; CreatorDoesNotExist:principal; UserDoesNotExist:principal}});
+    readAllCreators: () -> (vec record {id:principal; nftIds:vec nat64; flickr:text; instagram:text; createdAt:nat64; behance:text; reddit:text}) query;
+    readAllMerchants: () -> (vec record {slotIds:vec nat64; collabCreators:vec principal; createdAt:nat64; uuid:text}) query;
+    readAllNfts: () -> (vec record {id:nat64; imageMetadata:text; createdAt:nat64; creatorId:principal; imageUrl:text}) query;
+    readAllSlots: () -> (vec record {id:nat64; userId:principal; createdAt:nat64; merchantId:text; claimed:bool; nftId:nat64}) query;
+    readAllUsers: () -> (vec record {id:principal; nftIds:vec nat64; slotIds:vec nat64; createdAt:nat64}) query;
+    readCreator: (principal) -> (opt record {id:principal; nftIds:vec nat64; flickr:text; instagram:text; createdAt:nat64; behance:text; reddit:text}) query;
+    readMerchant: (text) -> (opt record {slotIds:vec nat64; collabCreators:vec principal; createdAt:nat64; uuid:text}) query;
+    readNft: (nat64) -> (opt record {id:nat64; imageMetadata:text; createdAt:nat64; creatorId:principal; imageUrl:text}) query;
+    readSlot: (nat64) -> (opt record {id:nat64; userId:principal; createdAt:nat64; merchantId:text; claimed:bool; nftId:nat64}) query;
+    readUser: (principal) -> (opt record {id:principal; nftIds:vec nat64; slotIds:vec nat64; createdAt:nat64}) query;
+}
