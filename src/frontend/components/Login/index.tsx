@@ -1,11 +1,15 @@
 import React from "react";
 import { Navigate, useNavigate } from "react-router-dom";
+import {AppBar, Toolbar, IconButton} from "@mui/material";
 
 /*
  * Connect2ic provides essential utilities for IC app development
  */
 import { ConnectButton, ConnectDialog, useConnect } from "@connect2ic/react";
 import "@connect2ic/core/style.css";
+import { Grid } from "@mui/material";
+import Navbar from "../Navbar";
+import { Container } from "@mui/system";
 
 export default function Login() {
     const navigate = useNavigate();
@@ -23,19 +27,29 @@ export default function Login() {
     return (
         <div>
             {isConnected && <Navigate to="/scan" />}
+            <Navbar/>
+            <Container maxWidth="sm">
             <div className="login-page">
-                <div className="login-container">
-                    <span>Login to ArtConnect to open a surprise</span>
-                    <div className="login-button">
-                        <ConnectButton
-                            onConnect={() => {
-                                navigate("/slots");
-                            }}
-                        />
-                    </div>
-                    <ConnectDialog />
-                </div>
+                <Grid container>
+                    <Grid item xs>
+                        <div className="login-container">
+                            <div className="logo-section">
+                                Art Connect
+                            </div>
+                            <span>Login to ArtConnect to open a surprise</span>
+                            <div className="login-button">
+                                <ConnectButton
+                                    onConnect={() => {
+                                        navigate("/slots");
+                                    }}
+                                />
+                            </div>
+                            <ConnectDialog />
+                        </div>
+                    </Grid>
+                </Grid>
             </div>
+            </Container>
         </div>
     );
 }
