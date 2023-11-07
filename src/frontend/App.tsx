@@ -29,6 +29,13 @@ import Login from "./components/Login";
 import Scan from "./components/Scan";
 import Slots from "./components/Slots";
 import { Profile } from "./components/Profile";
+import Navbar from "./components/Navbar";
+import ImageAfterScan from "./components/ImageAfterScan";
+import ImageDetailPage from "./components/ImageDetailPage";
+import CustomerDashboard from "./components/CustomerDashboard";
+import ClaimPage from "./components/ClaimPage";
+
+
 
 const router = createBrowserRouter([
     {
@@ -46,6 +53,26 @@ const router = createBrowserRouter([
     {
         path: "/profile",
         element: <Profile />,
+    },
+    {
+        path: "/navbar",
+        element: <Navbar/>,
+    },
+    {
+        path: "/imageafterscan",
+        element: <ImageAfterScan/>,
+    },
+    {
+        path: "/imagedetailpage",
+        element: <ImageDetailPage/>,
+    },
+    {
+        path: "/customerdashboard",
+        element: <CustomerDashboard/>,
+    },
+    {
+        path: "/claimpage",
+        element: <ClaimPage/>,
     },
 ]);
 
