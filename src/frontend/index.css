@@ -16,13 +16,27 @@ button {
 }
 
 .mobile-wrapper {
-    width: 414px;
+    /* width: 414px; */
     margin: 0 auto;
     /* border: 2px solid; */
 }
 
 .App {
     /* padding: 2%; */
+}
+
+/* ------------------------------ Navbar ------------------------------ */
+.navbar{
+    background-color: white !important;
+    display: flex !important;
+}
+
+.toolbar{
+    display: flex !important;
+    justify-content: space-between !important;
+}
+.hamburger-icon{
+   color: #E8833A !important;
 }
 
 /* --------------------------------- Login Page --------------------------------- */
@@ -43,20 +57,51 @@ button {
     margin: 20px;
 }
 
-/* -------------------------------- Scan Page ------------------------------- */
-.scan-page {
-    height: 100vh;
+.logo-section{
+    width: 100px;
+    height: 100px;
+    background-color: #FAE6D8;
+    margin-bottom: 10px;
+    border-radius: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: auto;
+    border: 2px solid #E8833A;
 }
 
-.scan-container {
-    display: grid;
-    place-items: center;
+.header{
+    width: 100%;
+    height: 50px;
+    background-color: orange;
 }
 
+/* -------------------------------- Scan Page ------------------------------- */
+.scan-page {
+    height: 100vh;
+}
+
+.button-scan{
+    background-color: orange !important;
+    width: 200px !important;
+    height: 50px !important;
+    color: white !important;
+    margin-top: 20px !important;
+}
+
+.button-collection{
+    background-color: orange !important;
+    width: 200px !important;
+    height: 50px !important;
+    color: white !important;
+    margin-top: 20px !important;
+}
+
+.scan-dummy{
+    width: 300px;
+    height: 300px;
+    background-color: grey;
+    border-radius: 30px;
+}
 /* -------------------------------- Slots Page ------------------------------- */
 .slots-page {
     height: 100vh;
@@ -75,3 +120,74 @@ button {
 }
 
 /* ------------------------------ Profile Page ------------------------------ */
+
+/* -------------------------------- After Scan Page ------------------------------- */
+.afterscan-page {
+    height: 100vh;
+}
+
+.title{
+    text-align: center !important;
+    padding-top: 20px;
+}
+
+.title-map{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: -10px;
+}
+
+.wrap-image-scan{
+    width: 200px;
+    height: 200px;
+    background-color: black;
+}
+
+.wrap-image-scan img{
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+/* -------------------------------- Image Detail Page ------------------------------- */
+.imagedetail-page {
+    height: 100vh;
+}
+
+.button-share{
+    background-color: #E8833A !important;
+}
+
+.button-explore{
+    background-color: #E8833A !important;
+}
+
+/* -------------------------------- Customer Dashboard ------------------------------- */
+.customerdashboard-page{
+    height: 100vh;
+}
+
+.item-collection{
+    width: 150px !important;
+    height: 100px !important;
+    background-color: grey !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* -------------------------------- Customer Dashboard ------------------------------- */
+.wrap-image-claim{
+    width: 100%;
+    height:auto;
+}
+
+.wrap-image-claim img{
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+
+

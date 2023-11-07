@@ -12,6 +12,7 @@
         "@dfinity/agent": "^0.11.3",
         "@emotion/react": "^11.11.1",
         "@emotion/styled": "^11.11.0",
+        "@mui/icons-material": "^5.14.16",
         "@mui/material": "^5.14.14",
         "azle": "^0.18.5",
         "react": "^18.1.0",
