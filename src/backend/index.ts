@@ -5,6 +5,7 @@ import {
     ic,
     nat64,
     nat8,
+    None,
     Ok,
     Opt,
     Principal,
@@ -19,7 +20,7 @@ import {
 } from "azle";
 import { v4 as uuidv4 } from "uuid";
 
-import { Nft, Slot, User, Merchant, Creator } from "./model";
+import { Nft, User, Merchant, Creator, Loyalty } from "./model";
 
 const Errors = Variant({
     SlotDoesNotExist: nat64,
@@ -27,95 +28,24 @@ const Errors = Variant({
     UserDoesNotExist: Principal,
     MerchantDoesNotExist: text,
     CreatorDoesNotExist: Principal,
+    LoyaltyDoesNotExist: nat64,
     // SlotClaimed: Principal,
     // CodeValidationError: Principal,
 });
 
 let nftCounter: nat64 = 0n;
-let slotCounter: nat64 = 0n;
+let loyaltyCounter: nat64 = 0n;
 let nfts = StableBTreeMap(nat64, Nft, 0);
-let slots = StableBTreeMap(nat64, Slot, 1);
-let users = StableBTreeMap(Principal, User, 2);
-let merchants = StableBTreeMap(text, Merchant, 3);
-let creators = StableBTreeMap(Principal, Creator, 4);
+let users = StableBTreeMap(Principal, User, 1);
+let merchants = StableBTreeMap(text, Merchant, 2);
+let creators = StableBTreeMap(Principal, Creator, 3);
+let loyalties = StableBTreeMap(nat64, Loyalty, 4);
 
 export default Canister({
-    /* ---------------------------------- NFTS ---------------------------------- */
-    createNft: update([Principal, text, text], Nft, (creatorId, imageUrl, imageMetadata) => {
-        const nft: typeof Nft = {
-            id: nftCounter,
-            creatorId,
-            imageUrl,
-            imageMetadata,
-            createdAt: ic.time(),
-        };
-
-        nfts.insert(nft.id, nft);
-        nftCounter++; // Increment Nft Token ID
-        return nft;
-    }),
-    readAllNfts: query([], Vec(Nft), () => {
-        return nfts.values();
-    }),
-    readNft: query([nat64], Opt(Nft), (id) => {
-        return nfts.get(id);
-    }),
-    deleteNft: update([nat64], Result(Nft, Errors), (id) => {
-        const nftOpts = nfts.get(id);
-
-        if ("None" in nftOpts) {
-            return Err({
-                NftDoesNotExist: id,
-            });
-        }
-
-        const nft = nftOpts.Some;
-
-        nfts.remove(nft.id);
-        return Ok(nft);
-    }),
-
-    /* ---------------------------------- Slots --------------------------------- */
-    createSlot: update([nat64, Principal, text, nat64], Slot, (id, userId, merchantId, nftId) => {
-        const slot: typeof Slot = {
-            id,
-            userId,
-            merchantId,
-            nftId,
-            claimed: false,
-            createdAt: ic.time(),
-        };
-
-        slots.insert(slot.id, slot);
-        return slot;
-    }),
-    readAllSlots: query([], Vec(Slot), () => {
-        return slots.values();
-    }),
-    readSlot: query([nat64], Opt(Slot), (id) => {
-        return slots.get(id);
-    }),
-    deleteSlot: update([nat64], Result(Slot, Errors), (id) => {
-        const slotOpts = slots.get(id);
-
-        if ("None" in slotOpts) {
-            return Err({
-                SlotDoesNotExist: id,
-            });
-        }
-
-        const slot = slotOpts.Some;
-
-        slots.remove(slot.id);
-        return Ok(slot);
-    }),
-
     /* ---------------------------------- Users --------------------------------- */
     createUser: update([Principal], User, (id) => {
         const user: typeof User = {
             id,
-            slotIds: [],
-            nftIds: [],
             createdAt: ic.time(),
         };
 
@@ -139,24 +69,19 @@ export default Canister({
 
         const user = userOpts.Some;
 
-        user.slotIds.forEach((slotId) => {
-            slots.remove(slotId);
-        });
-        user.nftIds.forEach((nftId) => {
-            nfts.remove(nftId);
-        });
-
         users.remove(user.id);
         return Ok(user);
     }),
 
     /* -------------------------------- Merchants ------------------------------- */
-    createMerchant: update([], Merchant, () => {
+    createMerchant: update([text, text, text], Merchant, (name, lon, lat) => {
         const uuid = uuidv4();
         const merchant: typeof Merchant = {
             uuid,
-            slotIds: [],
-            collabCreators: [],
+            name,
+            lon,
+            lat,
+            collaborations: [],
             createdAt: ic.time(),
         };
 
@@ -180,27 +105,25 @@ export default Canister({
 
         const merchant = merchantOpts.Some;
 
-        merchant.slotIds.forEach((slotId) => {
-            slots.remove(slotId);
-        });
-
         merchants.remove(merchant.uuid);
         return Ok(merchant);
     }),
 
     /* -------------------------------- Creators -------------------------------- */
     createCreator: update(
-        [text, text, text, text],
+        [text, text, text, text, text, text, text],
         Creator,
-        (behance, flickr, instagram, reddit) => {
+        (name, city, province, behance, flickr, instagram, reddit) => {
             const id = generateId();
             const creator: typeof Creator = {
                 id,
+                name,
+                city,
+                province,
                 behance,
                 flickr,
                 instagram,
                 reddit,
-                nftIds: [],
                 createdAt: ic.time(),
             };
 
@@ -225,12 +148,172 @@ export default Canister({
 
         const creator = creatorOpts.Some;
 
-        creator.nftIds.forEach((nftId) => {
-            nfts.remove(nftId);
-        });
-
         creators.remove(creator.id);
         return Ok(creator);
+    }),
+
+    /* ---------------------------------- NFTS ---------------------------------- */
+    createNft: update(
+        [Principal, text, text],
+        Result(Nft, Errors),
+        (creatorId, imageUrl, metadataUrl) => {
+            const creatorOpt = creators.get(creatorId);
+
+            if ("None" in creatorOpt) {
+                return Err({
+                    CreatorDoesNotExist: creatorId,
+                });
+            }
+
+            const creator = creatorOpt.Some;
+
+            const nft: typeof Nft = {
+                id: nftCounter,
+                imageUrl,
+                metadataUrl,
+                userId: creator.id,
+                creatorId,
+                loyaltyId: 0n,
+                createdAt: ic.time(),
+            };
+
+            nfts.insert(nft.id, nft);
+            nftCounter++; // Increment Nft Token ID
+
+            return Ok(nft);
+        }
+    ),
+    readAllNfts: query([], Vec(Nft), () => {
+        return nfts.values();
+    }),
+    readNft: query([nat64], Opt(Nft), (id) => {
+        return nfts.get(id);
+    }),
+    deleteNft: update([nat64], Result(Nft, Errors), (id) => {
+        // Find nft
+        const nftOpts = nfts.get(id);
+
+        if ("None" in nftOpts) {
+            return Err({
+                NftDoesNotExist: id,
+            });
+        }
+
+        const nft = nftOpts.Some;
+
+        nfts.remove(nft.id);
+        return Ok(nft);
+    }),
+    sendNft: update([nat64, Principal, nat64], Result(Nft, Errors), (nftId, userId, loyaltyId) => {
+        // Find NFT
+        const nftOpts = nfts.get(nftId);
+
+        if ("None" in nftOpts) {
+            return Err({
+                NftDoesNotExist: nftId,
+            });
+        }
+
+        const nft = nftOpts.Some;
+
+        const updatedNft: typeof Nft = {
+            ...nft,
+            userId,
+            loyaltyId,
+        };
+
+        nfts.insert(updatedNft.id, updatedNft);
+
+        return Ok(nft);
+    }),
+    queryUserNft: query([Principal], Vec(Nft), (userId) => {
+        return nfts.values().filter((nft) => {
+            nft.userId.toText() === userId.toText();
+        });
+    }),
+    queryCreatorNft: query([Principal], Vec(Nft), (creatorId) => {
+        return nfts.values().filter((nft) => {
+            nft.creatorId.toText() === creatorId.toText();
+        });
+    }),
+    queryLoyaltyNft: query([nat64], Vec(Nft), (loyaltyId) => {
+        return nfts.values().filter((nft) => {
+            nft.loyaltyId === loyaltyId;
+        });
+    }),
+    /* --------------------------------- Loyalty -------------------------------- */
+    createLoyalty: update([Principal, text], Loyalty, (userId, merchantId) => {
+        const loyalty: typeof Loyalty = {
+            id: loyaltyCounter,
+            claimed: false,
+            userId,
+            merchantId,
+            createdAt: ic.time(),
+        };
+
+        loyalties.insert(loyalty.id, loyalty);
+        loyaltyCounter++;
+
+        return loyalty;
+    }),
+    readAllLoyalties: query([], Vec(Loyalty), () => {
+        return loyalties.values();
+    }),
+    readLoyalty: query([nat64], Opt(Loyalty), (loyaltyId) => {
+        return loyalties.get(loyaltyId);
+    }),
+    deleteLoyalty: update([nat64], Result(Loyalty, Errors), (id) => {
+        // Find the loyalty record
+        const loyaltyOpt = loyalties.get(id);
+
+        if ("None" in loyaltyOpt) {
+            return Err({
+                LoyaltyDoesNotExist: id,
+            });
+        }
+
+        const loyalty = loyaltyOpt.Some;
+
+        // Remove loyalty
+        loyalties.remove(id);
+
+        return Ok(loyalty);
+    }),
+    clearLoyalty: update(
+        [nat64, Principal, text],
+        Result(Loyalty, Errors),
+        (loyaltyId, userId, merchantId) => {
+            // Change claimed status to true
+            const loyaltyOpt = loyalties.get(loyaltyId);
+
+            if ("None" in loyaltyOpt) {
+                return Err({
+                    LoyaltyDoesNotExist: loyaltyId,
+                });
+            }
+
+            const loyalty = loyaltyOpt.Some;
+            loyalty.claimed = true;
+
+            // Create new and assign new loyalty to user and merchant
+            const newLoyalty: typeof Loyalty = {
+                id: loyaltyCounter,
+                claimed: false,
+                userId,
+                merchantId,
+                createdAt: ic.time(),
+            };
+
+            loyalties.insert(newLoyalty.id, newLoyalty);
+            loyaltyCounter++;
+
+            return Ok(loyalty);
+        }
+    ),
+    queryLoyalty: update([Principal, text], Vec(Loyalty), (userId, merchantId) => {
+        return loyalties.values().filter((loyalty) => {
+            loyalty.userId.toText() === userId.toText() && loyalty.merchantId === merchantId;
+        });
     }),
 });
 
