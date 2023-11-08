@@ -25,15 +25,15 @@ import * as artconnect from "../../.dfx/local/canisters/artconnect";
 // import { Counter } from "./components/Counter";
 // import { Transfer } from "./components/Transfer";
 // import { Profile } from "./components/Profile";
-import Login from "./components/Login";
-import Scan from "./components/Scan";
-import Slots from "./components/Slots";
-import { Profile } from "./components/Profile";
+import Login from "./pages/Login";
+import Scan from "./pages/Scan";
+import Slots from "./pages/Slots";
+import { Profile } from "./pages/Profile";
 import Navbar from "./components/Navbar";
-import ImageAfterScan from "./components/ImageAfterScan";
-import ImageDetailPage from "./components/ImageDetailPage";
-import CustomerDashboard from "./components/CustomerDashboard";
-import ClaimPage from "./components/ClaimPage";
+import ImageAfterScan from "./pages/ScannedImage";
+import ImageDetailPage from "./pages/ImageDetail";
+import CustomerDashboard from "./pages/CustomerDashboard";
+import ClaimPage from "./pages/Claim";
 
 
 
@@ -45,10 +45,6 @@ const router = createBrowserRouter([
     {
         path: "/scan",
         element: <Scan />,
-    },
-    {
-        path: "/slots",
-        element: <Slots />,
     },
     {
         path: "/profile",
@@ -80,6 +76,7 @@ function App() {
     return (
         <div className="mobile-wrapper">
             <div className="App">
+                {/* <Navbar/> */}
                 <RouterProvider router={router} />
             </div>
         </div>

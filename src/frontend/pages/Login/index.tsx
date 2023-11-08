@@ -8,7 +8,6 @@ import {AppBar, Toolbar, IconButton} from "@mui/material";
 import { ConnectButton, ConnectDialog, useConnect } from "@connect2ic/react";
 import "@connect2ic/core/style.css";
 import { Grid } from "@mui/material";
-import Navbar from "../Navbar";
 import { Container } from "@mui/system";
 
 export default function Login() {
@@ -27,7 +26,6 @@ export default function Login() {
     return (
         <div>
             {isConnected && <Navigate to="/scan" />}
-            <Navbar/>
             <Container maxWidth="sm">
             <div className="login-page">
                 <Grid container>
@@ -40,7 +38,7 @@ export default function Login() {
                             <div className="login-button">
                                 <ConnectButton
                                     onConnect={() => {
-                                        navigate("/slots");
+                                        navigate("/scan");
                                     }}
                                 />
                             </div>

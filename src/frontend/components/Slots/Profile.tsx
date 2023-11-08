@@ -1,2 +1,0 @@
-function Profile() {}
-export { Profile };

@@ -1,13 +1,12 @@
 import { Button } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../Navbar";
 import Grid from '@mui/material/Grid';
 
 export default function Scan() {
-    const navigate = useNavigate();
-    const redirectMain = () => {
-        navigate("/main");
+    const navigateScan = useNavigate();
+    const redirectScan = () => {
+        navigateScan("/imageafterscan");
     };
 
     const navigateCollection = useNavigate();
@@ -18,7 +17,6 @@ export default function Scan() {
     return (
         <>
             <div className="scan-page">
-                <Navbar />
                 <Grid container>
                     <Grid item xs={12} style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop:'20px'}}>
                         <div className="scan-dummy"></div>
@@ -26,7 +24,7 @@ export default function Scan() {
                     <Grid item xs={12} style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                         <Button className="button-scan"
                             onClick={() => {
-                                redirectMain();
+                                redirectScan();
                             }}
                         >
                             Scan My Surprise
