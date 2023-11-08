@@ -1,17 +1,15 @@
 import React from 'react'
-import Navbar from './Navbar'
 import { Grid, Button } from '@mui/material';
 import { Typography } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import YourIconLogo from '../assets/rose.jpg';
+import YourIconLogo from '../../assets/rose.jpg'
 
 const ClaimPage = () => {
-
+    
     return (
         <>
             <div className='afterscan-page'>
                 <Grid container>
-                    <Navbar />
                     <Grid item xs={12}>
                         <h1 className='title'>Honney Coffee</h1>
                         <div className='title-map'>

@@ -1,18 +1,16 @@
 import React from 'react'
-import Navbar from './Navbar'
 import Grid from '@mui/material/Grid';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { right } from '@popperjs/core';
 import { Button } from '@mui/material';
 import ShareIcon from '@mui/icons-material/Share';
-import YourIconLogo from '../assets/rose.jpg';
+import YourIconLogo from '../../assets/rose.jpg'
 
 const ImageDetailPage = () => {
     return (
         <>
             <div className='imagedetail-page'>
                 <Grid container>
-                    <Navbar />
                     <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
                         <h2 className='title'>Po Party</h2>
                     </Grid>

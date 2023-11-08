@@ -1,5 +1,4 @@
 import React from 'react'
-import Navbar from './Navbar'
 import Grid from '@mui/material/Grid';
 import { Typography, Paper } from '@mui/material';
 import { useNavigate } from "react-router-dom";
@@ -13,7 +12,6 @@ const CustomerDashboard = () => {
     return (
         <>
             <div className='customerdashboard-page'>
-                <Navbar />
                 <Grid container>
                     <Grid item xs={12}>
                         <h1 className='title'>My Collection</h1>
