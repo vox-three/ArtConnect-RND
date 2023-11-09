@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { BrowserRouter, createBrowserRouter, RouterProvider, useLocation } from "react-router-dom";
 import logo from "./assets/dfinity.svg";
 
 /*
@@ -34,6 +34,7 @@ import ImageAfterScan from "./pages/ScannedImage";
 import ImageDetailPage from "./pages/ImageDetail";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import ClaimPage from "./pages/Claim";
+import BottomBar from "./components/BottomBar";
 
 
 
@@ -49,10 +50,6 @@ const router = createBrowserRouter([
     {
         path: "/profile",
         element: <Profile />,
-    },
-    {
-        path: "/navbar",
-        element: <Navbar/>,
     },
     {
         path: "/imageafterscan",
@@ -72,12 +69,14 @@ const router = createBrowserRouter([
     },
 ]);
 
+
 function App() {
     return (
         <div className="mobile-wrapper">
             <div className="App">
                 {/* <Navbar/> */}
                 <RouterProvider router={router} />
+                {/* <BottomBar/> */}
             </div>
         </div>
     );

@@ -2,6 +2,8 @@ import React from 'react'
 import Grid from '@mui/material/Grid';
 import { Typography, Paper } from '@mui/material';
 import { useNavigate } from "react-router-dom";
+import BottomBar from "../../components/BottomBar";
+import Navbar from "../../components/Navbar";
 
 const CustomerDashboard = () => {
 
@@ -11,6 +13,7 @@ const CustomerDashboard = () => {
     };
     return (
         <>
+            <Navbar/>
             <div className='customerdashboard-page'>
                 <Grid container>
                     <Grid item xs={12}>
@@ -26,7 +29,7 @@ const CustomerDashboard = () => {
                             <div className='item-collection'>
                             </div>
                     </Grid> */}
-                    <Grid container spacing={2} style={{ padding:'20px' }} >
+                    <Grid container spacing={2} style={{ padding:'20px', marginTop:'20px' }} >
                         <Grid item xs={6} sm={6} md={6}>
                             <Paper elevation={3} onClick={redirectClaim}>
                                 {/* Kotak 1 */}
@@ -39,6 +42,7 @@ const CustomerDashboard = () => {
                     </Grid>
                 </Grid>
             </div>
+            <BottomBar/>
         </>
     )
 }

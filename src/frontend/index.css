@@ -35,7 +35,7 @@ button {
     display: flex !important;
     justify-content: space-between !important;
 }
-.hamburger-icon{
+.account-icon{
    color: #E8833A !important;
 }
 
@@ -45,12 +45,6 @@ button {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: auto;
-}
-
-.login-container {
-    display: grid;
-    place-items: center;
 }
 
 .login-button {
@@ -60,13 +54,16 @@ button {
 .logo-section{
     width: 100px;
     height: 100px;
-    background-color: #FAE6D8;
     margin-bottom: 10px;
     border-radius: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 2px solid #E8833A;
+}
+.logo-section img{
+    width: 100%;
+    height: auto;
+    object-fit: cover;
 }
 
 .header{
@@ -187,6 +184,20 @@ button {
     width: 100%;
     height: auto;
     object-fit: cover;
+}
+
+.bottom-navigation{
+    position: fixed !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    cursor: pointer !important;
+    box-shadow: 0px -3px 7px rgba(0, 0, 0, 0.3);
+}
+
+.hover-bottom-navigation:hover{
+    background-color: rgba(128, 128, 128, 0.1) !important;
+    opacity: 0.9 !important;
+    cursor: pointer !important;
 }
 
 

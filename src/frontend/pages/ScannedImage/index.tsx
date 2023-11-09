@@ -4,6 +4,8 @@ import { Typography, Button } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import YourIconLogo from '../../assets/rose.jpg'
 import { useNavigate } from "react-router-dom";
+import BottomBar from "../../components/BottomBar";
+import Navbar from "../../components/Navbar";
 
 const ImageAfterScan = () => {
     const navigateDetailPage = useNavigate();
@@ -12,6 +14,7 @@ const ImageAfterScan = () => {
     };
     return (
         <>    
+            <Navbar/>
             <div className='afterscan-page'>
                <Grid container>
                     <Grid item xs={12}>
@@ -30,7 +33,7 @@ const ImageAfterScan = () => {
                         </Typography>
                     </Grid>
                     <Grid item xs={12} style={{ display:'flex', justifyContent:'center', marginTop:'20px' }}>
-                        <div className='wrap-image-scan' onClick={redirectDetailPage}>
+                        <div className='wrap-image-scan'>
                             <img src={YourIconLogo} alt="" />
                         </div>
                     </Grid>
@@ -44,6 +47,7 @@ const ImageAfterScan = () => {
                     </Grid>
                </Grid>
             </div>
+            <BottomBar/>
         </>
     )
 }
