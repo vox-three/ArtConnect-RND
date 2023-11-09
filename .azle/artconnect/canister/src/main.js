@@ -30,7 +30,6 @@ function _extends() {
     };
     return _extends.apply(this, arguments);
 }
-var _globalThis;
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -96109,6 +96108,18 @@ var require_sha256 = __commonJS({
         })();
     }
 });
+// node_modules/azle/src/lib/ic/accept_message.ts
+function acceptMessage() {
+    return globalThis._azleIc ? globalThis._azleIc.acceptMessage() : void 0;
+}
+// node_modules/azle/src/lib/ic/arg_data_raw.ts
+function argDataRaw() {
+    return globalThis._azleIc ? new Uint8Array(globalThis._azleIc.argDataRaw()) : void 0;
+}
+// node_modules/azle/src/lib/ic/arg_data_raw_size.ts
+function argDataRawSize() {
+    return globalThis._azleIc ? globalThis._azleIc.argDataRawSize() : void 0;
+}
 // node_modules/azle/node_modules/@dfinity/candid/lib/esm/idl.js
 var idl_exports = {};
 __export(idl_exports, {
@@ -98692,25 +98703,13 @@ function Func(args1, ret1, annotations1 = []) {
 function Service(t3) {
     return new ServiceClass(t3);
 }
-// node_modules/azle/src/lib/ic/accept_message.ts
-function acceptMessage() {
-    return globalThis._azleIc ? globalThis._azleIc.acceptMessage() : void 0;
-}
-// node_modules/azle/src/lib/ic/arg_data_raw.ts
-function argDataRaw() {
-    return globalThis._azleIc ? new Uint8Array(globalThis._azleIc.argDataRaw()) : void 0;
-}
-// node_modules/azle/src/lib/ic/arg_data_raw_size.ts
-function argDataRawSize() {
-    return globalThis._azleIc ? globalThis._azleIc.argDataRawSize() : void 0;
-}
 // node_modules/azle/src/lib/candid/types/primitive/nats/nat64.ts
 var AzleNat64 = class {
-    static getIDL() {
+    static getIdl() {
         return idl_exports.Nat64;
     }
     constructor(){
-        this._kind = "AzleNat64";
+        this._azleKind = "AzleNat64";
     }
 };
 var nat64 = AzleNat64;
@@ -98758,6 +98757,200 @@ function v4(options1, buf1, offset1) {
     return unsafeStringify(rnds1);
 }
 var v4_default = v4;
+// node_modules/azle/src/lib/candid/serde/visitors/visit/tuple.ts
+function visitTuple(visitor1, components1, data1) {
+    const fields1 = components1.map((value1, index1)=>value1.accept(visitor1, {
+            js_data: data1.js_data[index1],
+            candidType: data1.candidType.innerTypes[index1]
+        }));
+    return [
+        ...fields1
+    ];
+}
+// node_modules/azle/src/lib/candid/serde/visitors/visit/vec.ts
+function visitVec(visitor1, ty1, data1) {
+    if (ty1 instanceof idl_exports.PrimitiveType) {
+        return data1.js_data;
+    }
+    return data1.js_data.map((array_elem1)=>{
+        return ty1.accept(visitor1, {
+            js_data: array_elem1,
+            candidType: data1.candidType.innerType
+        });
+    });
+}
+// node_modules/azle/src/lib/candid/serde/visitors/visit/record.ts
+function visitRecord(visitor1, fields1, data1) {
+    const candidFields1 = fields1.reduce((acc1, [memberName1, memberIdl1])=>{
+        const fieldData1 = data1.js_data[memberName1];
+        const fieldClass1 = data1.candidType[memberName1];
+        return _extends({}, acc1, {
+            [memberName1]: memberIdl1.accept(visitor1, {
+                js_data: fieldData1,
+                candidType: fieldClass1
+            })
+        });
+    }, {});
+    return candidFields1;
+}
+// node_modules/azle/src/lib/candid/serde/visitors/visit/recursive.ts
+function visitRec(visitor1, ty1, data1) {
+    let candidType1 = data1.candidType();
+    if (candidType1.isCanister) {
+        candidType1 = candidType1([]);
+    }
+    return ty1.accept(visitor1, _extends({}, data1, {
+        candidType: candidType1
+    }));
+}
+// node_modules/azle/src/lib/candid/to_idl.ts
+function toIdl(candidType1, parents1 = []) {
+    if ("azleName" in candidType1) {
+        const parent1 = parents1.find((parent21)=>parent21.name === candidType1.azleName);
+        if (parent1 !== void 0) {
+            return parent1.idl;
+        }
+    }
+    if ("isCanister" in candidType1 && candidType1.isCanister) {
+        return toIdl(candidType1(), parents1);
+    }
+    return candidType1.getIdl(parents1);
+}
+function toIdlArray(candidTypes1, parents1 = []) {
+    if (Array.isArray(candidTypes1)) {
+        return candidTypes1.map((value1)=>toIdl(value1, parents1));
+    }
+    const idlType1 = toIdl(candidTypes1, parents1);
+    return Array.isArray(idlType1) ? idlType1 : [
+        idlType1
+    ];
+}
+// node_modules/azle/src/lib/candid/types/constructed/to_idl_map.ts
+function toIdlMap(candidMap1, parent1) {
+    const idlMap1 = {};
+    for(const key1 in candidMap1){
+        if (candidMap1.hasOwnProperty(key1)) {
+            const candidType1 = candidMap1[key1];
+            idlMap1[key1] = toIdl(candidType1, parent1);
+        }
+    }
+    return idlMap1;
+}
+// node_modules/azle/src/lib/candid/types/constructed/variant.ts
+function Variant2(obj1) {
+    return _extends({}, obj1, {
+        getIdl (parents1) {
+            return idl_exports.Variant(toIdlMap(obj1, parents1));
+        }
+    });
+}
+// node_modules/azle/src/lib/candid/types/primitive/null.ts
+var AzleNull = class {
+    static getIdl() {
+        return idl_exports.Null;
+    }
+    constructor(){
+        this._azleKind = "AzleNull";
+    }
+};
+var Null2 = AzleNull;
+// node_modules/azle/src/lib/system_types/rejection_code.ts
+var RejectionCode = Variant2({
+    NoError: Null2,
+    SysFatal: Null2,
+    SysTransient: Null2,
+    DestinationInvalid: Null2,
+    CanisterReject: Null2,
+    CanisterError: Null2,
+    Unknown: Null2
+});
+// node_modules/azle/src/lib/system_types/result.ts
+var AzleResult = class {
+    getIdl(parents1) {
+        return idl_exports.Variant({
+            Ok: toIdl(this.Ok, parents1),
+            Err: toIdl(this.Err, parents1)
+        });
+    }
+    constructor(ok1, err1){
+        this.Ok = ok1;
+        this.Err = err1;
+    }
+};
+function Result(ok1, err1) {
+    return new AzleResult(ok1, err1);
+}
+((Result21)=>{
+    function Ok21(value1) {
+        return {
+            Ok: value1
+        };
+    }
+    Result21.Ok = Ok21;
+    function Err21(value1) {
+        return {
+            Err: value1
+        };
+    }
+    Result21.Err = Err21;
+})(Result || (Result = {}));
+function Ok(value1) {
+    return {
+        Ok: value1
+    };
+}
+function Err(value1) {
+    return {
+        Err: value1
+    };
+}
+// node_modules/azle/src/lib/candid/serde/visitors/visit/variant/azle_variant.ts
+function visitAzleVariant(visitor1, fields1, data1) {
+    const candidFields1 = fields1.reduce((acc1, [memberName1, memberIdl1])=>{
+        const fieldData1 = data1.js_data[memberName1];
+        const fieldClass1 = data1.candidType[memberName1];
+        if (fieldData1 === void 0) {
+            return acc1;
+        }
+        return _extends({}, acc1, {
+            [memberName1]: memberIdl1.accept(visitor1, {
+                candidType: fieldClass1,
+                js_data: fieldData1
+            })
+        });
+    }, {});
+    return candidFields1;
+}
+// node_modules/azle/src/lib/candid/serde/visitors/visit/variant/azle_result.ts
+function visitAzleResult(visitor1, fields1, data1) {
+    if ("Ok" in data1.js_data) {
+        const OK_FIELD_INDEX1 = 0;
+        const okField1 = fields1[OK_FIELD_INDEX1];
+        const okData1 = data1.js_data["Ok"];
+        const okClass1 = data1.candidType.Ok;
+        return Result.Ok(okField1[1].accept(visitor1, {
+            js_data: okData1,
+            candidType: okClass1
+        }));
+    }
+    if ("Err" in data1.js_data) {
+        const ERR_FIELD_INDEX1 = 1;
+        const errField1 = fields1[ERR_FIELD_INDEX1];
+        const errData1 = data1.js_data["Err"];
+        const errClass1 = data1.candidType.Err;
+        return Result.Err(errField1[1].accept(visitor1, {
+            js_data: errData1,
+            candidType: errClass1
+        }));
+    }
+}
+// node_modules/azle/src/lib/candid/serde/visitors/visit/variant/index.ts
+function visitVariant(visitor1, fields1, data1) {
+    if (data1.candidType instanceof AzleResult) {
+        return visitAzleResult(visitor1, fields1, data1);
+    }
+    return visitAzleVariant(visitor1, fields1, data1);
+}
 // node_modules/azle/src/lib/candid/serde/visitors/encode_visitor.ts
 var EncodeVisitor = class extends idl_exports.Visitor {
     visitService(t3, data1) {
@@ -98788,7 +98981,7 @@ var EncodeVisitor = class extends idl_exports.Visitor {
         if ("Some" in data1.js_data) {
             const candid1 = ty1.accept(this, {
                 js_data: data1.js_data.Some,
-                candidType: data1.candidType._azleType
+                candidType: data1.candidType.innerType
             });
             return [
                 candid1
@@ -98811,11 +99004,11 @@ var EncodeVisitor = class extends idl_exports.Visitor {
 };
 // node_modules/azle/src/lib/candid/types/constructed/blob.ts
 var AzleBlob = class {
-    static getIDL() {
+    static getIdl() {
         return idl_exports.Vec(idl_exports.Nat8);
     }
     constructor(){
-        this._kind = "AzleBlob";
+        this._azleKind = "AzleBlob";
     }
 };
 var blob = AzleBlob;
@@ -98832,414 +99025,84 @@ function Opt2(t3) {
     return new AzleOpt(t3);
 }
 var AzleOpt = class {
-    getIDL(parents1) {
-        return idl_exports.Opt(toIDLType(this._azleType, parents1));
+    getIdl(parents1) {
+        return idl_exports.Opt(toIdl(this.innerType, parents1));
     }
     constructor(t3){
-        this._kind = "AzleOpt";
-        this._azleType = t3;
+        this._azleKind = "AzleOpt";
+        this.innerType = t3;
     }
 };
 // node_modules/azle/src/lib/candid/types/constructed/record.ts
 function Record2(obj1) {
     return _extends({}, obj1, {
-        getIDL (parents1) {
-            return idl_exports.Record(processMap(obj1, parents1));
-        }
-    });
-}
-// node_modules/azle/src/lib/candid/types/constructed/variant.ts
-function Variant2(obj1) {
-    return _extends({}, obj1, {
-        getIDL (parents1) {
-            return idl_exports.Variant(processMap(obj1, parents1));
+        getIdl (parents1) {
+            return idl_exports.Record(toIdlMap(obj1, parents1));
         }
     });
 }
 // node_modules/azle/src/lib/candid/types/constructed/vec.ts
 var AzleVec = class {
-    getIDL(parents1) {
-        return idl_exports.Vec(toIDLType(this._azleType, parents1));
+    getIdl(parents1) {
+        return idl_exports.Vec(toIdl(this.innerType, parents1));
     }
     constructor(t3){
-        this._azleType = t3;
+        this.innerType = t3;
     }
 };
 function Vec2(t3) {
     return new AzleVec(t3);
 }
-// node_modules/azle/src/lib/candid/types/constructed/index.ts
-function processMap(targetMap1, parent1) {
-    const newMap1 = {};
-    for(const key1 in targetMap1){
-        if (targetMap1.hasOwnProperty(key1)) {
-            const value1 = targetMap1[key1];
-            const newValue1 = toIDLType(value1, parent1);
-            newMap1[key1] = newValue1;
-        }
-    }
-    return newMap1;
-}
 // node_modules/azle/src/lib/candid/types/primitive/bool.ts
 var AzleBool = class {
-    static getIDL() {
+    static getIdl() {
         return idl_exports.Bool;
     }
     constructor(){
-        this._kind = "AzleBool";
+        this._azleKind = "AzleBool";
     }
 };
 var bool = AzleBool;
 // node_modules/azle/src/lib/candid/types/primitive/nats/nat.ts
 var AzleNat = class {
-    static getIDL() {
+    static getIdl() {
         return idl_exports.Nat;
     }
     constructor(){
-        this._kind = "AzleNat";
+        this._azleKind = "AzleNat";
     }
 };
 var nat = AzleNat;
 // node_modules/azle/src/lib/candid/types/primitive/nats/nat8.ts
 var AzleNat8 = class {
-    static getIDL() {
+    static getIdl() {
         return idl_exports.Nat8;
     }
     constructor(){
-        this._kind = "AzleNat8";
+        this._azleKind = "AzleNat8";
     }
 };
 var nat8 = AzleNat8;
 // node_modules/azle/src/lib/candid/types/primitive/nats/nat32.ts
 var AzleNat32 = class {
-    static getIDL() {
+    static getIdl() {
         return idl_exports.Nat32;
     }
     constructor(){
-        this._kind = "AzleNat32";
+        this._azleKind = "AzleNat32";
     }
 };
 var nat32 = AzleNat32;
-// node_modules/azle/src/lib/candid/types/primitive/null.ts
-var AzleNull = class {
-    static getIDL() {
-        return idl_exports.Null;
-    }
-    constructor(){
-        this._kind = "AzleNull";
-    }
-};
-var Null2 = AzleNull;
 // node_modules/azle/src/lib/candid/types/primitive/text.ts
 var AzleText = class {
-    static getIDL() {
+    static getIdl() {
         return idl_exports.Text;
     }
     constructor(){
-        this._kind = "AzleText";
+        this._azleKind = "AzleText";
     }
 };
 var text = AzleText;
-// node_modules/azle/src/lib/candid/types/reference/service.ts
-function Canister(canisterOptions1) {
-    let result1 = (parentOrPrincipal1)=>{
-        const callbacks1 = Object.entries(canisterOptions1).reduce((acc1, entry1)=>{
-            const key1 = entry1[0];
-            const value1 = entry1[1];
-            return _extends({}, acc1, {
-                [key1]: {
-                    canisterCallback: value1.callback,
-                    crossCanisterCallback: (...args1)=>{
-                        return serviceCall(this.principal, key1, value1.paramCandidTypes, value1.returnCandidType)(...args1);
-                    }
-                }
-            });
-        }, {});
-        const initOption1 = Object.entries(canisterOptions1).find(([key1, value1])=>value1.mode === "init");
-        const init1 = initOption1 === void 0 ? void 0 : {
-            name: initOption1[0]
-        };
-        const postUpgradeOption1 = Object.entries(canisterOptions1).find(([key1, value1])=>value1.mode === "postUpgrade");
-        const postUpgrade1 = postUpgradeOption1 === void 0 ? void 0 : {
-            name: postUpgradeOption1[0]
-        };
-        const preUpgradeOption1 = Object.entries(canisterOptions1).find(([key1, value1])=>value1.mode === "preUpgrade");
-        const preUpgrade1 = preUpgradeOption1 === void 0 ? void 0 : {
-            name: preUpgradeOption1[0]
-        };
-        const heartbeatOption1 = Object.entries(canisterOptions1).find(([key1, value1])=>value1.mode === "heartbeat");
-        const heartbeat1 = heartbeatOption1 === void 0 ? void 0 : {
-            name: heartbeatOption1[0]
-        };
-        const inspectMessageOption1 = Object.entries(canisterOptions1).find(([key1, value1])=>value1.mode === "inspectMessage");
-        const inspectMessage1 = inspectMessageOption1 === void 0 ? void 0 : {
-            name: inspectMessageOption1[0]
-        };
-        const queries1 = Object.entries(canisterOptions1).filter((entry1)=>{
-            const key1 = entry1[0];
-            const value1 = entry1[1];
-            return value1.mode === "query";
-        }).map((entry1)=>{
-            const key1 = entry1[0];
-            const value1 = entry1[1];
-            return {
-                name: key1,
-                composite: value1.async,
-                guard_name: createGlobalGuard(value1.guard, key1)
-            };
-        });
-        const updates1 = Object.entries(canisterOptions1).filter((entry1)=>{
-            const key1 = entry1[0];
-            const value1 = entry1[1];
-            return value1.mode === "update";
-        }).map((entry1)=>{
-            const key1 = entry1[0];
-            const value1 = entry1[1];
-            return {
-                name: key1,
-                guard_name: createGlobalGuard(value1.guard, key1)
-            };
-        });
-        let returnFunction1 = (principal1)=>{
-            const callbacks21 = Object.entries(canisterOptions1).reduce((acc1, entry1)=>{
-                const key1 = entry1[0];
-                const value1 = entry1[1];
-                return _extends({}, acc1, {
-                    [key1]: {
-                        canisterCallback: value1.callback,
-                        crossCanisterCallback: (...args1)=>{
-                            return serviceCall(principal1, key1, value1.paramCandidTypes, value1.returnCandidType)(...args1);
-                        }
-                    }
-                });
-            }, {});
-            return _extends({}, callbacks21, {
-                principal: principal1
-            });
-        };
-        returnFunction1.init = init1;
-        returnFunction1.post_upgrade = postUpgrade1;
-        returnFunction1.pre_upgrade = preUpgrade1;
-        returnFunction1.heartbeat = heartbeat1;
-        returnFunction1.inspect_message = inspectMessage1;
-        returnFunction1.queries = queries1;
-        returnFunction1.updates = updates1;
-        returnFunction1.callbacks = callbacks1;
-        returnFunction1.getSystemFunctionIDLs = (parents1)=>{
-            const serviceFunctionInfo1 = canisterOptions1;
-            return Object.entries(serviceFunctionInfo1).reduce((accumulator1, [_methodName1, functionInfo1])=>{
-                const mode1 = functionInfo1.mode;
-                if (mode1 === "update" || mode1 === "query") {
-                    return accumulator1;
-                }
-                const paramRealIdls1 = toParamIDLTypes(functionInfo1.paramCandidTypes, parents1);
-                const returnRealIdl1 = toReturnIDLType(functionInfo1.returnCandidType, parents1);
-                return [
-                    ...accumulator1,
-                    idl_exports.Func(paramRealIdls1, returnRealIdl1, [
-                        mode1
-                    ])
-                ];
-            }, []);
-        };
-        returnFunction1.getIDL = (parents1)=>{
-            const serviceFunctionInfo1 = canisterOptions1;
-            const record1 = Object.entries(serviceFunctionInfo1).reduce((accumulator1, [methodName21, functionInfo1])=>{
-                const paramIdlTypes1 = toParamIDLTypes(functionInfo1.paramCandidTypes, parents1);
-                const returnIdlTypes1 = toReturnIDLType(functionInfo1.returnCandidType, parents1);
-                const mode1 = functionInfo1.mode;
-                let annotations1 = [];
-                if (mode1 === "update") {} else if (mode1 === "query") {
-                    annotations1 = [
-                        "query"
-                    ];
-                } else {
-                    return accumulator1;
-                }
-                return _extends({}, accumulator1, {
-                    [methodName21]: idl_exports.Func(paramIdlTypes1, returnIdlTypes1, annotations1)
-                });
-            }, {});
-            return idl_exports.Service(record1);
-        };
-        if (parentOrPrincipal1 !== void 0 && parentOrPrincipal1._isPrincipal) {
-            return returnFunction1(parentOrPrincipal1);
-        }
-        return returnFunction1;
-    };
-    result1._azleIsCanister = true;
-    return result1;
-}
-function serviceCall(canisterId1, methodName21, paramCandidTypes1, returnCandidType1) {
-    return async function(_1, notify21, callFunction1, cycles1, ...args1) {
-        const encodedArgs1 = encodeMultiple(paramCandidTypes1, args1);
-        if (notify21) {
-            try {
-                return callFunction1(canisterId1, methodName21, encodedArgs1, cycles1);
-            } catch (error1) {
-                throw error1;
-            }
-        } else {
-            const encodedResult1 = await callFunction1(canisterId1, methodName21, encodedArgs1, cycles1);
-            return decode3(returnCandidType1, encodedResult1);
-        }
-    };
-}
-function createGlobalGuard(guard1, functionName1) {
-    if (guard1 === void 0) {
-        return void 0;
-    }
-    const guardName1 = `_azleGuard_${functionName1}`;
-    globalThis[guardName1] = guard1;
-    return guardName1;
-}
-// node_modules/azle/src/lib/candid/types/reference/principal.ts
-var Principal3 = class extends Principal {
-    static getIDL() {
-        return idl_exports.Principal;
-    }
-};
-// node_modules/azle/src/lib/candid/index.ts
-function toIDLType(candidType1, parents1) {
-    if ("_azleName" in candidType1) {
-        const parent1 = parents1.find((parent21)=>parent21.name === candidType1._azleName);
-        if (parent1 !== void 0) {
-            return parent1.idl;
-        }
-    }
-    if ("_azleIsCanister" in candidType1 && candidType1._azleIsCanister) {
-        return toIDLType(candidType1(), parents1);
-    }
-    return candidType1.getIDL(parents1);
-}
-function toParamIDLTypes(paramCandidTypes1, parents1 = []) {
-    return paramCandidTypes1.map((value1)=>toIDLType(value1, parents1));
-}
-function toReturnIDLType(returnCandidType1, parents1 = []) {
-    const idlType1 = toIDLType(returnCandidType1, parents1);
-    return Array.isArray(idlType1) ? idlType1 : [
-        idlType1
-    ];
-}
-// node_modules/azle/src/lib/system_types/result.ts
-var AzleResult = class {
-    getIDL(parents1) {
-        return idl_exports.Variant({
-            Ok: toIDLType(this._azleOk, parents1),
-            Err: toIDLType(this._azleErr, parents1)
-        });
-    }
-    constructor(ok1, err1){
-        this._azleOk = ok1;
-        this._azleErr = err1;
-    }
-};
-function Result(ok1, err1) {
-    return new AzleResult(ok1, err1);
-}
-((Result21)=>{
-    function Ok21(value1) {
-        return {
-            Ok: value1
-        };
-    }
-    Result21.Ok = Ok21;
-    function Err21(value1) {
-        return {
-            Err: value1
-        };
-    }
-    Result21.Err = Err21;
-})(Result || (Result = {}));
-function Ok(value1) {
-    return {
-        Ok: value1
-    };
-}
-function Err(value1) {
-    return {
-        Err: value1
-    };
-}
-// node_modules/azle/src/lib/candid/serde/visitors/index.ts
-function visitTuple(visitor1, components1, data1) {
-    const fields1 = components1.map((value1, index1)=>value1.accept(visitor1, {
-            js_data: data1.js_data[index1],
-            candidType: data1.candidType._azleTypes[index1]
-        }));
-    return [
-        ...fields1
-    ];
-}
-function visitVec(visitor1, ty1, data1) {
-    if (ty1 instanceof idl_exports.PrimitiveType) {
-        return data1.js_data;
-    }
-    return data1.js_data.map((array_elem1)=>{
-        return ty1.accept(visitor1, {
-            js_data: array_elem1,
-            candidType: data1.candidType._azleType
-        });
-    });
-}
-function visitRecord(visitor1, fields1, data1) {
-    const candidFields1 = fields1.reduce((acc1, [memberName1, memberIdl1])=>{
-        const fieldData1 = data1.js_data[memberName1];
-        const fieldClass1 = data1.candidType[memberName1];
-        return _extends({}, acc1, {
-            [memberName1]: memberIdl1.accept(visitor1, {
-                js_data: fieldData1,
-                candidType: fieldClass1
-            })
-        });
-    }, {});
-    return candidFields1;
-}
-function visitVariant(visitor1, fields1, data1) {
-    if (data1.candidType instanceof AzleResult) {
-        if ("Ok" in data1.js_data) {
-            const okField1 = fields1[0];
-            const okData1 = data1.js_data["Ok"];
-            const okClass1 = data1.candidType._azleOk;
-            return Result.Ok(okField1[1].accept(visitor1, {
-                js_data: okData1,
-                candidType: okClass1
-            }));
-        }
-        if ("Err" in data1.js_data) {
-            const errField1 = fields1[1];
-            const errData1 = data1.js_data["Err"];
-            const errClass1 = data1.candidType._azleErr;
-            return Result.Err(errField1[1].accept(visitor1, {
-                js_data: errData1,
-                candidType: errClass1
-            }));
-        }
-    }
-    const candidFields1 = fields1.reduce((acc1, [memberName1, memberIdl1])=>{
-        const fieldData1 = data1.js_data[memberName1];
-        const fieldClass1 = data1.candidType[memberName1];
-        if (fieldData1 === void 0) {
-            return acc1;
-        }
-        return _extends({}, acc1, {
-            [memberName1]: memberIdl1.accept(visitor1, {
-                candidType: fieldClass1,
-                js_data: fieldData1
-            })
-        });
-    }, {});
-    return candidFields1;
-}
-function visitRec(visitor1, ty1, data1) {
-    let candidType1 = data1.candidType();
-    if (candidType1._azleIsCanister) {
-        candidType1 = candidType1([]);
-    }
-    return ty1.accept(visitor1, _extends({}, data1, {
-        candidType: candidType1
-    }));
-}
 // node_modules/azle/src/lib/candid/serde/visitors/decode_visitor.ts
 var DecodeVisitor = class extends idl_exports.Visitor {
     visitService(t3, data1) {
@@ -99272,7 +99135,7 @@ var DecodeVisitor = class extends idl_exports.Visitor {
         }
         const candid1 = ty1.accept(this, {
             js_data: data1.js_data[0],
-            candidType: data1.candidType._azleType
+            candidType: data1.candidType.innerType
         });
         return {
             Some: candid1
@@ -99291,9 +99154,206 @@ var DecodeVisitor = class extends idl_exports.Visitor {
         return visitVariant(this, fields1, data1);
     }
 };
-// node_modules/azle/src/lib/candid/serde/index.ts
-function encode3(candidType1, data1, parents1 = []) {
-    const idl1 = toIDLType(candidType1, parents1);
+// node_modules/azle/src/lib/candid/serde/decode.ts
+function decode3(candidType1, data1) {
+    if (Array.isArray(candidType1)) {
+        return decodeMultiple(candidType1, data1);
+    }
+    return decodeSingle(candidType1, data1);
+}
+function decodeSingle(candidType1, data1) {
+    const idl1 = toIdl(candidType1);
+    const idlIsAzleVoid1 = Array.isArray(idl1);
+    if (idlIsAzleVoid1) {
+        return void 0;
+    }
+    const candidDecodedValue1 = idl_exports.decode([
+        idl1
+    ], data1)[0];
+    return idl1.accept(new DecodeVisitor(), {
+        candidType: candidType1,
+        js_data: candidDecodedValue1
+    });
+}
+function decodeMultiple(candidTypes1, data1) {
+    const idls1 = toIdlArray(candidTypes1);
+    const decoded1 = idl_exports.decode(idls1, data1);
+    return idls1.map((idl1, index1)=>idl1.accept(new DecodeVisitor(), {
+            candidType: candidTypes1[index1],
+            js_data: decoded1[index1]
+        }));
+}
+// node_modules/azle/src/lib/candid/types/reference/service/canister_function/query_update.ts
+function createQueryMethods(canisterOptions1) {
+    return Object.entries(canisterOptions1).filter(([_name1, canisterMethod1])=>canisterMethod1.mode === "query").map(([methodName21, canisterMethod1])=>createQueryMethod(methodName21, canisterMethod1.async, canisterMethod1.guard));
+}
+function createUpdateMethods(canisterOptions1) {
+    return Object.entries(canisterOptions1).filter(([_name1, canisterMethod1])=>canisterMethod1.mode === "update").map(([methodName21, canisterMethod1])=>createUpdateMethod(methodName21, canisterMethod1.guard));
+}
+function createQueryMethod(methodName21, isComposite1, guardFunction1) {
+    return {
+        name: methodName21,
+        composite: isComposite1,
+        guard_name: createGlobalGuard(guardFunction1, methodName21)
+    };
+}
+function createUpdateMethod(methodName21, guardFunction1) {
+    return {
+        name: methodName21,
+        guard_name: createGlobalGuard(guardFunction1, methodName21)
+    };
+}
+function createGlobalGuard(guard1, guardedMethodName1) {
+    if (guard1 === void 0) {
+        return void 0;
+    }
+    const guardName1 = `_azleGuard_${guardedMethodName1}`;
+    globalThis._azleGuardFunctions[guardName1] = guard1;
+    return guardName1;
+}
+// node_modules/azle/src/lib/candid/types/reference/service/canister_function/system_methods.ts
+function createSystemMethod(mode1, canisterOptions1) {
+    const methodOption1 = Object.entries(canisterOptions1).find(([_methodName1, canisterMethod1])=>canisterMethod1.mode === mode1);
+    if (methodOption1 === void 0) {
+        return void 0;
+    }
+    return {
+        name: methodOption1[0]
+    };
+}
+function createGetSystemFunctionIdlFunction(canisterOptions1) {
+    return (parents1)=>{
+        const serviceFunctionInfo1 = canisterOptions1;
+        return Object.entries(serviceFunctionInfo1).reduce((accumulator1, [_methodName1, functionInfo1])=>{
+            const mode1 = functionInfo1.mode;
+            const isSystemMethod1 = !(mode1 === "update" || mode1 === "query");
+            if (!isSystemMethod1) {
+                return accumulator1;
+            }
+            const paramIdls1 = toIdlArray(functionInfo1.paramCandidTypes, parents1);
+            const returnIdl1 = toIdlArray(functionInfo1.returnCandidType, parents1);
+            return [
+                ...accumulator1,
+                idl_exports.Func(paramIdls1, returnIdl1, [
+                    mode1
+                ])
+            ];
+        }, []);
+    };
+}
+// node_modules/azle/src/lib/candid/types/reference/service/canister_function/index.ts
+function createCanisterFunction(canisterOptions1) {
+    let canister1 = createCanisterFunctionBase(canisterOptions1);
+    canister1.init = createSystemMethod("init", canisterOptions1);
+    canister1.heartbeat = createSystemMethod("heartbeat", canisterOptions1);
+    canister1.post_upgrade = createSystemMethod("postUpgrade", canisterOptions1);
+    canister1.pre_upgrade = createSystemMethod("preUpgrade", canisterOptions1);
+    canister1.inspect_message = createSystemMethod("inspectMessage", canisterOptions1);
+    canister1.queries = createQueryMethods(canisterOptions1);
+    canister1.updates = createUpdateMethods(canisterOptions1);
+    canister1.callbacks = createCallbacks(canisterOptions1);
+    canister1.getIdl = createGetIdlFunction(canisterOptions1);
+    canister1.getSystemFunctionIdls = createGetSystemFunctionIdlFunction(canisterOptions1);
+    return canister1;
+}
+function createGetIdlFunction(canisterOptions1) {
+    return (parents1)=>{
+        const serviceFunctionInfo1 = canisterOptions1;
+        const isQueryOrUpdate1 = (mode1)=>{
+            return mode1 === "query" || mode1 === "update";
+        };
+        const record1 = Object.entries(serviceFunctionInfo1).filter(([_methodName1, functionInfo1])=>isQueryOrUpdate1(functionInfo1.mode)).reduce((accumulator1, [methodName21, functionInfo1])=>{
+            return _extends({}, accumulator1, {
+                [methodName21]: createUpdateOrQueryFunctionIdl(functionInfo1, parents1)
+            });
+        }, {});
+        return idl_exports.Service(record1);
+    };
+}
+function createAnnotation(mode1) {
+    if (mode1 === "query") {
+        return [
+            "query"
+        ];
+    }
+    return [];
+}
+function createUpdateOrQueryFunctionIdl(functionInfo1, parents1) {
+    const annotations1 = createAnnotation(functionInfo1.mode);
+    const paramIdls1 = toIdlArray(functionInfo1.paramCandidTypes, parents1);
+    const returnIdls1 = toIdlArray(functionInfo1.returnCandidType, parents1);
+    return idl_exports.Func(paramIdls1, returnIdls1, annotations1);
+}
+function createCallbacks(canisterOptions1) {
+    return Object.entries(canisterOptions1).reduce((acc1, entry1)=>{
+        const methodName21 = entry1[0];
+        const canisterMethod1 = entry1[1];
+        return _extends({}, acc1, {
+            [methodName21]: canisterMethod1.callback
+        });
+    }, {});
+}
+function createCanisterFunctionBase(canisterOptions1) {
+    return (principal1)=>{
+        const callbacks1 = Object.entries(canisterOptions1).reduce((acc1, entry1)=>{
+            const key1 = entry1[0];
+            const value1 = entry1[1];
+            return _extends({}, acc1, {
+                [key1]: (...args1)=>{
+                    return serviceCall(principal1, key1, value1.paramCandidTypes, value1.returnCandidType)(...args1);
+                }
+            });
+        }, {});
+        return _extends({}, callbacks1, {
+            principal: principal1
+        });
+    };
+}
+function serviceCall(canisterId1, methodName21, paramCandidTypes1, returnCandidType1) {
+    return async function(notify21, callFunction1, cycles1, ...args1) {
+        const encodedArgs1 = encode3(paramCandidTypes1, args1);
+        if (notify21) {
+            try {
+                return callFunction1(canisterId1, methodName21, encodedArgs1, cycles1);
+            } catch (error1) {
+                throw error1;
+            }
+        } else {
+            const encodedResult1 = await callFunction1(canisterId1, methodName21, encodedArgs1, cycles1);
+            return decode3(returnCandidType1, encodedResult1);
+        }
+    };
+}
+// node_modules/azle/src/lib/candid/types/reference/service/index.ts
+function Canister(canisterOptions1) {
+    let result1 = (parentOrPrincipal1)=>{
+        const canisterFunction1 = createCanisterFunction(canisterOptions1);
+        if (parentOrPrincipal1 !== void 0 && parentOrPrincipal1._isPrincipal) {
+            return canisterFunction1(parentOrPrincipal1);
+        }
+        return canisterFunction1;
+    };
+    result1.isCanister = true;
+    return result1;
+}
+// node_modules/azle/src/lib/candid/types/reference/principal.ts
+var Principal3 = class extends Principal {
+    static getIdl() {
+        return idl_exports.Principal;
+    }
+};
+// node_modules/azle/src/lib/candid/serde/encode.ts
+function encode3(candidType1, data1) {
+    if (Array.isArray(candidType1)) {
+        if (Array.isArray(data1)) {
+            return encodeMultiple(candidType1, data1);
+        }
+        throw new Error("If multiple candid types are given then multiple data entries are expected.");
+    }
+    return encodeSingle(candidType1, data1);
+}
+function encodeSingle(candidType1, data1) {
+    const idl1 = toIdl(candidType1);
     const idlIsAzleVoid1 = Array.isArray(idl1);
     if (idlIsAzleVoid1) {
         return new Uint8Array(idl_exports.encode([], []));
@@ -99308,51 +99368,13 @@ function encode3(candidType1, data1, parents1 = []) {
         encodeReadyKey1
     ]));
 }
-function decode3(candidType1, data1, parents1 = []) {
-    const idl1 = toIDLType(candidType1, parents1);
-    const idlIsAzleVoid1 = Array.isArray(idl1);
-    if (idlIsAzleVoid1) {
-        return void 0;
-    }
-    const candidDecodedValue1 = idl_exports.decode([
-        idl1
-    ], data1)[0];
-    return idl1.accept(new DecodeVisitor(), {
-        candidType: candidType1,
-        js_data: candidDecodedValue1
-    });
-}
-function encodeMultiple(candidTypes1, data1, parents1 = []) {
-    const { values: values1, idls: idls1 } = data1.reduce((acc1, datum1, index1)=>{
-        const candidType1 = candidTypes1[index1];
-        const idl1 = toIDLType(candidType1, parents1);
-        const encodeReadyValue1 = idl1.accept(new EncodeVisitor(), {
-            candidType: candidType1,
-            js_data: datum1
-        });
-        return {
-            values: [
-                ...acc1.values,
-                encodeReadyValue1
-            ],
-            idls: [
-                ...acc1.idls,
-                idl1
-            ]
-        };
-    }, {
-        values: [],
-        idls: []
-    });
-    return new Uint8Array(idl_exports.encode(idls1, values1));
-}
-function decodeMultiple(candidTypes1, data1, parents1 = []) {
-    const idls1 = candidTypes1.map((candidType1)=>toIDLType(candidType1, parents1));
-    const decoded1 = idl_exports.decode(idls1, data1);
-    return idls1.map((idl1, index1)=>idl1.accept(new DecodeVisitor(), {
+function encodeMultiple(candidTypes1, data1) {
+    const idls1 = toIdlArray(candidTypes1);
+    const values1 = data1.map((datum1, index1)=>idls1[index1].accept(new EncodeVisitor(), {
             candidType: candidTypes1[index1],
-            js_data: decoded1[index1]
+            js_data: datum1
         }));
+    return new Uint8Array(idl_exports.encode(idls1, values1));
 }
 // node_modules/azle/src/lib/ic/call_raw.ts
 function callRaw(canisterId1, method21, argsRaw1, payment1) {
@@ -99360,6 +99382,9 @@ function callRaw(canisterId1, method21, argsRaw1, payment1) {
         return void 0;
     }
     return new Promise((resolve1, reject21)=>{
+        if (globalThis._azleIc === void 0) {
+            return void 0;
+        }
         const promiseId1 = v4_default();
         const globalResolveId1 = `_resolve_${promiseId1}`;
         const globalRejectId1 = `_reject_${promiseId1}`;
@@ -99391,6 +99416,9 @@ function callRaw128(canisterId1, method21, argsRaw1, payment1) {
         return void 0;
     }
     return new Promise((resolve1, reject21)=>{
+        if (globalThis._azleIc === void 0) {
+            return void 0;
+        }
         const promiseId1 = v4_default();
         const globalResolveId1 = `_resolve_${promiseId1}`;
         const globalRejectId1 = `_reject_${promiseId1}`;
@@ -99423,7 +99451,7 @@ function call(method21, config1) {
     }
     const { callFunction: callFunction1, cycles: cycles1 } = getCallFunctionAndCycles(config1 == null ? void 0 : config1.cycles, config1 == null ? void 0 : config1.cycles128);
     var _config_args;
-    return method21.crossCanisterCallback("_AZLE_CROSS_CANISTER_CALL", false, callFunction1, cycles1, ...(_config_args = config1 == null ? void 0 : config1.args) != null ? _config_args : []);
+    return method21(false, callFunction1, cycles1, ...(_config_args = config1 == null ? void 0 : config1.args) != null ? _config_args : []);
 }
 function getCallFunctionAndCycles(cycles1, cycles1281) {
     if (cycles1281 !== void 0) {
@@ -99465,7 +99493,7 @@ function canisterBalance() {
         return void 0;
     }
     const canisterBalanceCandidBytes1 = globalThis._azleIc.canisterBalance();
-    return BigInt(decode3(nat64, canisterBalanceCandidBytes1));
+    return decode3(nat64, canisterBalanceCandidBytes1);
 }
 // node_modules/azle/src/lib/ic/canister_balance_128.ts
 function canisterBalance128() {
@@ -99473,7 +99501,7 @@ function canisterBalance128() {
         return void 0;
     }
     const canisterBalance128CandidBytes1 = globalThis._azleIc.canisterBalance128();
-    return BigInt(decode3(nat, canisterBalance128CandidBytes1));
+    return decode3(nat, canisterBalance128CandidBytes1);
 }
 // node_modules/azle/src/lib/ic/canister_version.ts
 function canisterVersion() {
@@ -99481,9 +99509,9 @@ function canisterVersion() {
         return void 0;
     }
     const canisterVersionCandidBytes1 = globalThis._azleIc.canisterVersion();
-    return BigInt(decode3(nat64, canisterVersionCandidBytes1));
+    return decode3(nat64, canisterVersionCandidBytes1);
 }
-// node_modules/azle/src/lib/ic/types/index.ts
+// node_modules/azle/src/lib/ic/types/timer_id.ts
 var TimerId = AzleNat64;
 // node_modules/azle/src/lib/ic/clear_timer.ts
 function clearTimer(timerId1) {
@@ -99491,9 +99519,9 @@ function clearTimer(timerId1) {
         return void 0;
     }
     globalThis._azleIc.clearTimer(encode3(TimerId, timerId1).buffer);
-    const timerCallbackId1 = globalThis.icTimers[timerId1.toString()];
-    delete globalThis.icTimers[timerId1.toString()];
-    delete globalThis._azleTimerCallbackIds[timerCallbackId1];
+    const timerCallbackId1 = globalThis._azleIcTimers[timerId1.toString()];
+    delete globalThis._azleIcTimers[timerId1.toString()];
+    delete globalThis._azleTimerCallbacks[timerCallbackId1];
 }
 // node_modules/azle/src/lib/ic/data_certificate.ts
 function dataCertificate() {
@@ -99517,7 +99545,7 @@ function instructionCounter() {
         return void 0;
     }
     const instructionCounterCandidBytes1 = globalThis._azleIc.instructionCounter();
-    return BigInt(decode3(nat64, instructionCounterCandidBytes1));
+    return decode3(nat64, instructionCounterCandidBytes1);
 }
 // node_modules/azle/src/lib/ic/is_controller.ts
 function isController(principal1) {
@@ -99537,7 +99565,7 @@ function msgCyclesAccept(maxAmount1) {
     }
     const maxAmountCandidBytes1 = encode3(nat64, maxAmount1).buffer;
     const msgCyclesAcceptCandidBytes1 = globalThis._azleIc.msgCyclesAccept(maxAmountCandidBytes1);
-    return BigInt(decode3(nat64, msgCyclesAcceptCandidBytes1));
+    return decode3(nat64, msgCyclesAcceptCandidBytes1);
 }
 // node_modules/azle/src/lib/ic/msg_cycles_accept_128.ts
 function msgCyclesAccept128(maxAmount1) {
@@ -99546,7 +99574,7 @@ function msgCyclesAccept128(maxAmount1) {
     }
     const maxAmountCandidBytes1 = encode3(nat, maxAmount1).buffer;
     const msgCyclesAccept128CandidBytes1 = globalThis._azleIc.msgCyclesAccept128(maxAmountCandidBytes1);
-    return BigInt(decode3(nat, msgCyclesAccept128CandidBytes1));
+    return decode3(nat, msgCyclesAccept128CandidBytes1);
 }
 // node_modules/azle/src/lib/ic/msg_cycles_available.ts
 function msgCyclesAvailable() {
@@ -99554,7 +99582,7 @@ function msgCyclesAvailable() {
         return void 0;
     }
     const msgCyclesAvailableCandidBytes1 = globalThis._azleIc.msgCyclesAvailable();
-    return BigInt(decode3(nat64, msgCyclesAvailableCandidBytes1));
+    return decode3(nat64, msgCyclesAvailableCandidBytes1);
 }
 // node_modules/azle/src/lib/ic/msg_cycles_available_128.ts
 function msgCyclesAvailable128() {
@@ -99562,7 +99590,7 @@ function msgCyclesAvailable128() {
         return void 0;
     }
     const msgCyclesAvailable128CandidBytes1 = globalThis._azleIc.msgCyclesAvailable128();
-    return BigInt(decode3(nat, msgCyclesAvailable128CandidBytes1));
+    return decode3(nat, msgCyclesAvailable128CandidBytes1);
 }
 // node_modules/azle/src/lib/ic/msg_cycles_refunded.ts
 function msgCyclesRefunded() {
@@ -99570,7 +99598,7 @@ function msgCyclesRefunded() {
         return void 0;
     }
     const msgCyclesRefundedCandidBytes1 = globalThis._azleIc.msgCyclesRefunded();
-    return BigInt(decode3(nat64, msgCyclesRefundedCandidBytes1));
+    return decode3(nat64, msgCyclesRefundedCandidBytes1);
 }
 // node_modules/azle/src/lib/ic/msg_cycles_refunded_128.ts
 function msgCyclesRefunded128() {
@@ -99578,7 +99606,7 @@ function msgCyclesRefunded128() {
         return void 0;
     }
     const msgCyclesRefunded128CandidBytes1 = globalThis._azleIc.msgCyclesRefunded128();
-    return BigInt(decode3(nat, msgCyclesRefunded128CandidBytes1));
+    return decode3(nat, msgCyclesRefunded128CandidBytes1);
 }
 // node_modules/azle/src/lib/ic/notify_raw.ts
 function notifyRaw(canisterId1, method21, argsRaw1, payment1) {
@@ -99596,7 +99624,7 @@ function notify(method21, config1) {
         return void 0;
     }
     var _config_cycles, _config_args;
-    return method21.crossCanisterCallback("_AZLE_CROSS_CANISTER_CALL", true, notifyRaw, (_config_cycles = config1 == null ? void 0 : config1.cycles) != null ? _config_cycles : 0n, ...(_config_args = config1 == null ? void 0 : config1.args) != null ? _config_args : []);
+    return method21(true, notifyRaw, (_config_cycles = config1 == null ? void 0 : config1.cycles) != null ? _config_cycles : 0n, ...(_config_args = config1 == null ? void 0 : config1.args) != null ? _config_args : []);
 }
 // node_modules/azle/src/lib/ic/performance_counter.ts
 function performanceCounter(counterType1) {
@@ -99605,7 +99633,7 @@ function performanceCounter(counterType1) {
     }
     const counterTypeCandidBytes1 = encode3(nat32, counterType1).buffer;
     const performanceCounterCandidBytes1 = globalThis._azleIc.performanceCounter(counterTypeCandidBytes1);
-    return BigInt(decode3(nat64, performanceCounterCandidBytes1));
+    return decode3(nat64, performanceCounterCandidBytes1);
 }
 // node_modules/azle/src/lib/ic/print.ts
 function print(...args1) {
@@ -99682,18 +99710,15 @@ function setTimer(delay1, callback1) {
     if (globalThis._azleIc === void 0) {
         return void 0;
     }
-    const decode51 = (value1)=>{
-        return BigInt(decode3(nat64, value1));
-    };
     const timerCallbackId1 = `_timer_${v4_default()}`;
-    const timerId1 = decode51(globalThis._azleIc.setTimer(encode3(nat64, delay1).buffer, timerCallbackId1));
-    globalThis.icTimers[timerId1.toString()] = timerCallbackId1;
-    globalThis._azleTimerCallbackIds[timerCallbackId1] = ()=>{
+    const timerId1 = decode3(nat64, globalThis._azleIc.setTimer(encode3(nat64, delay1).buffer, timerCallbackId1));
+    globalThis._azleIcTimers[timerId1.toString()] = timerCallbackId1;
+    globalThis._azleTimerCallbacks[timerCallbackId1] = ()=>{
         try {
             callback1();
         } finally{
-            delete globalThis.icTimers[timerId1.toString()];
-            delete globalThis._azleTimerCallbackIds[timerCallbackId1];
+            delete globalThis._azleIcTimers[timerId1.toString()];
+            delete globalThis._azleTimerCallbacks[timerCallbackId1];
         }
     };
     return timerId1;
@@ -99703,13 +99728,10 @@ function setTimerInterval(interval1, callback1) {
     if (globalThis._azleIc === void 0) {
         return void 0;
     }
-    const decode51 = (value1)=>{
-        return BigInt(decode3(nat64, value1));
-    };
     const timerCallbackId1 = `_interval_timer_${v4_default()}`;
-    const timerId1 = decode51(globalThis._azleIc.setTimerInterval(encode3(nat64, interval1).buffer, timerCallbackId1));
-    globalThis.icTimers[timerId1.toString()] = timerCallbackId1;
-    globalThis._azleTimerCallbackIds[timerCallbackId1] = callback1;
+    const timerId1 = decode3(nat64, globalThis._azleIc.setTimerInterval(encode3(nat64, interval1).buffer, timerCallbackId1));
+    globalThis._azleIcTimers[timerId1.toString()] = timerCallbackId1;
+    globalThis._azleTimerCallbacks[timerCallbackId1] = callback1;
     return timerId1;
 }
 // node_modules/azle/src/lib/ic/stable_64_grow.ts
@@ -99718,14 +99740,14 @@ function stable64Grow(newPages1) {
         return void 0;
     }
     const newPagesCandidBytes1 = encode3(nat64, newPages1).buffer;
-    return BigInt(decode3(nat64, globalThis._azleIc.stable64Grow(newPagesCandidBytes1)));
+    return decode3(nat64, globalThis._azleIc.stable64Grow(newPagesCandidBytes1));
 }
 // node_modules/azle/src/lib/ic/stable_64_read.ts
 function stable64Read(offset1, length1) {
     if (globalThis._azleIc === void 0) {
         return void 0;
     }
-    const paramsCandidBytes1 = encodeMultiple([
+    const paramsCandidBytes1 = encode3([
         nat64,
         nat64
     ], [
@@ -99739,14 +99761,14 @@ function stable64Size() {
     if (globalThis._azleIc === void 0) {
         return void 0;
     }
-    return BigInt(decode3(nat64, globalThis._azleIc.stable64Size()));
+    return decode3(nat64, globalThis._azleIc.stable64Size());
 }
 // node_modules/azle/src/lib/ic/stable_64_write.ts
 function stable64Write(offset1, buffer1) {
     if (globalThis._azleIc === void 0) {
         return void 0;
     }
-    const paramsCandidBytes1 = encodeMultiple([
+    const paramsCandidBytes1 = encode3([
         nat64,
         blob
     ], [
@@ -99775,7 +99797,7 @@ function stableRead(offset1, length1) {
     if (globalThis._azleIc === void 0) {
         return void 0;
     }
-    const paramsCandidBytes1 = encodeMultiple([
+    const paramsCandidBytes1 = encode3([
         nat32,
         nat32
     ], [
@@ -99796,7 +99818,7 @@ function stableWrite(offset1, buffer1) {
     if (globalThis._azleIc === void 0) {
         return void 0;
     }
-    const paramsCandidBytes1 = encodeMultiple([
+    const paramsCandidBytes1 = encode3([
         nat32,
         blob
     ], [
@@ -99811,14 +99833,14 @@ function time() {
         return void 0;
     }
     const timeCandidBytes1 = globalThis._azleIc.time();
-    return BigInt(decode3(nat64, timeCandidBytes1));
+    return decode3(nat64, timeCandidBytes1);
 }
 // node_modules/azle/src/lib/ic/trap.ts
 function trap(message1) {
     if (globalThis._azleIc === void 0) {
         return void 0;
     }
-    globalThis._azleIc.trap(message1);
+    return globalThis._azleIc.trap(message1);
 }
 // node_modules/azle/src/lib/ic/index.ts
 var ic = {
@@ -99874,10 +99896,11 @@ var ic = {
 var import_buffer3 = __toESM(require_buffer());
 globalThis.TextDecoder = require_text_encoding().TextDecoder;
 globalThis.TextEncoder = require_text_encoding().TextEncoder;
-(_globalThis = globalThis).icTimers || (_globalThis.icTimers = {});
+globalThis._azleIcTimers = {};
 globalThis._azleResolveIds = {};
 globalThis._azleRejectIds = {};
-globalThis._azleTimerCallbackIds = {};
+globalThis._azleTimerCallbacks = {};
+globalThis._azleGuardFunctions = {};
 globalThis.console = _extends({}, globalThis.console, {
     log: (...args1)=>{
         ic.print(...args1);
@@ -99893,52 +99916,21 @@ globalThis.crypto = _extends({}, globalThis.crypto, {
     }
 });
 globalThis.Buffer = import_buffer3.Buffer;
-// node_modules/azle/src/lib/canister_methods/query.ts
-function query(paramCandidTypes1, returnCandidType1, callback1, methodArgs1) {
-    const finalCallback1 = callback1 === void 0 ? void 0 : (...args1)=>{
-        var _methodArgs_manual;
-        executeMethod("query", args1, callback1, paramCandidTypes1, returnCandidType1, (_methodArgs_manual = methodArgs1 == null ? void 0 : methodArgs1.manual) != null ? _methodArgs_manual : false);
-    };
-    return {
-        mode: "query",
-        callback: finalCallback1,
-        paramCandidTypes: paramCandidTypes1,
-        returnCandidType: returnCandidType1,
-        async: callback1 === void 0 ? false : isAsync(callback1),
-        guard: methodArgs1 == null ? void 0 : methodArgs1.guard
-    };
+// node_modules/azle/src/lib/canister_methods/is_async.ts
+function isAsync(originalFunction1) {
+    if (originalFunction1[Symbol.toStringTag] === "AsyncFunction") {
+        return true;
+    } else if (originalFunction1.constructor.name === "AsyncFunction") {
+        return true;
+    } else if (originalFunction1.toString().includes("async ")) {
+        return true;
+    } else {
+        return false;
+    }
 }
-// node_modules/azle/src/lib/canister_methods/update.ts
-function update(paramCandidTypes1, returnCandidType1, callback1, methodArgs1) {
-    const finalCallback1 = callback1 === void 0 ? void 0 : (...args1)=>{
-        var _methodArgs_manual;
-        executeMethod("update", args1, callback1, paramCandidTypes1, returnCandidType1, (_methodArgs_manual = methodArgs1 == null ? void 0 : methodArgs1.manual) != null ? _methodArgs_manual : false);
-    };
-    return {
-        mode: "update",
-        callback: finalCallback1,
-        paramCandidTypes: paramCandidTypes1,
-        returnCandidType: returnCandidType1,
-        async: callback1 === void 0 ? false : isAsync(callback1),
-        guard: methodArgs1 == null ? void 0 : methodArgs1.guard
-    };
-}
-// node_modules/azle/src/lib/canister_methods/index.ts
+// node_modules/azle/src/lib/canister_methods/execute_method.ts
 function executeMethod(mode1, args1, callback1, paramCandidTypes1, returnCandidType1, manual1) {
-    if (mode1 === "heartbeat") {
-        const result21 = callback1();
-        if (result21 !== void 0 && result21 !== null && typeof result21.then === "function") {
-            result21.catch((error1)=>{
-                ic.trap(error1.toString());
-            });
-        }
-        return;
-    }
-    if (mode1 === "preUpgrade") {
-        callback1();
-        return;
-    }
-    const decodedArgs1 = decodeMultiple(paramCandidTypes1, args1[0]);
+    const decodedArgs1 = decode3(paramCandidTypes1, args1[0]);
     const result1 = callback1(...decodedArgs1);
     if (mode1 === "init" || mode1 === "postUpgrade" || mode1 === "inspectMessage") {
         return;
@@ -99964,29 +99956,52 @@ function reportFinalInstructions() {
         console.log(`final instructions: ${ic.instructionCounter()}`);
     }
 }
-function isAsync(originalFunction1) {
-    if (originalFunction1[Symbol.toStringTag] === "AsyncFunction") {
-        return true;
-    } else if (originalFunction1.constructor.name === "AsyncFunction") {
-        return true;
-    } else if (originalFunction1.toString().includes("async ")) {
-        return true;
-    } else {
-        return false;
-    }
+// node_modules/azle/src/lib/canister_methods/methods/query.ts
+function query(paramCandidTypes1, returnCandidType1, callback1, methodArgs1) {
+    const finalCallback1 = callback1 === void 0 ? void 0 : (...args1)=>{
+        var _methodArgs_manual;
+        executeMethod("query", args1, callback1, paramCandidTypes1, returnCandidType1, (_methodArgs_manual = methodArgs1 == null ? void 0 : methodArgs1.manual) != null ? _methodArgs_manual : false);
+    };
+    return {
+        mode: "query",
+        callback: finalCallback1,
+        paramCandidTypes: paramCandidTypes1,
+        returnCandidType: returnCandidType1,
+        async: callback1 === void 0 ? false : isAsync(callback1),
+        guard: methodArgs1 == null ? void 0 : methodArgs1.guard
+    };
+}
+// node_modules/azle/src/lib/canister_methods/methods/update.ts
+function update(paramCandidTypes1, returnCandidType1, callback1, methodArgs1) {
+    const finalCallback1 = callback1 === void 0 ? void 0 : (...args1)=>{
+        var _methodArgs_manual;
+        executeMethod("update", args1, callback1, paramCandidTypes1, returnCandidType1, (_methodArgs_manual = methodArgs1 == null ? void 0 : methodArgs1.manual) != null ? _methodArgs_manual : false);
+    };
+    return {
+        mode: "update",
+        callback: finalCallback1,
+        paramCandidTypes: paramCandidTypes1,
+        returnCandidType: returnCandidType1,
+        async: callback1 === void 0 ? false : isAsync(callback1),
+        guard: methodArgs1 == null ? void 0 : methodArgs1.guard
+    };
 }
 // node_modules/azle/src/lib/stable_b_tree_map.ts
 function StableBTreeMap(keyType1, valueType1, memoryId1) {
-    const candidEncodedMemoryId1 = encode3(nat8, memoryId1).buffer;
-    if (globalThis._azleIc !== void 0) {
-        globalThis._azleIc.stableBTreeMapInit(candidEncodedMemoryId1);
+    if (globalThis._azleIc === void 0) {
+        return void 0;
     }
+    const candidEncodedMemoryId1 = encode3(nat8, memoryId1).buffer;
+    globalThis._azleIc.stableBTreeMapInit(candidEncodedMemoryId1);
     return {
         /**
      * Checks if the given key exists in the map.
      * @param key the key to check.
      * @returns `true` if the key exists in the map, `false` otherwise.
      */ containsKey (key1) {
+            if (globalThis._azleIc === void 0) {
+                return void 0;
+            }
             const candidEncodedMemoryId21 = encode3(nat8, memoryId1).buffer;
             const candidEncodedKey1 = encode3(keyType1, key1).buffer;
             return globalThis._azleIc.stableBTreeMapContainsKey(candidEncodedMemoryId21, candidEncodedKey1);
@@ -99996,6 +100011,9 @@ function StableBTreeMap(keyType1, valueType1, memoryId1) {
      * @param key the location from which to retrieve.
      * @returns the value associated with the given key, if it exists.
      */ get (key1) {
+            if (globalThis._azleIc === void 0) {
+                return void 0;
+            }
             const candidEncodedMemoryId21 = encode3(nat8, memoryId1).buffer;
             const candidEncodedKey1 = encode3(keyType1, key1).buffer;
             const candidEncodedValue1 = globalThis._azleIc.stableBTreeMapGet(candidEncodedMemoryId21, candidEncodedKey1);
@@ -100011,6 +100029,9 @@ function StableBTreeMap(keyType1, valueType1, memoryId1) {
      * @param value the value to insert.
      * @returns the previous value of the key, if present.
      */ insert (key1, value1) {
+            if (globalThis._azleIc === void 0) {
+                return void 0;
+            }
             const candidEncodedMemoryId21 = encode3(nat8, memoryId1).buffer;
             const candidEncodedKey1 = encode3(keyType1, key1).buffer;
             const candidEncodedValue1 = encode3(valueType1, value1).buffer;
@@ -100025,6 +100046,9 @@ function StableBTreeMap(keyType1, valueType1, memoryId1) {
      * Checks if the map is empty.
      * @returns `true` if the map contains no elements, `false` otherwise.
      */ isEmpty () {
+            if (globalThis._azleIc === void 0) {
+                return void 0;
+            }
             const candidEncodedMemoryId21 = encode3(nat8, memoryId1).buffer;
             return globalThis._azleIc.stableBTreeMapIsEmpty(candidEncodedMemoryId21);
         },
@@ -100032,6 +100056,9 @@ function StableBTreeMap(keyType1, valueType1, memoryId1) {
      * Retrieves the items in the map in sorted order.
      * @returns tuples representing key/value pairs.
      */ items () {
+            if (globalThis._azleIc === void 0) {
+                return void 0;
+            }
             const candidEncodedMemoryId21 = encode3(nat8, memoryId1).buffer;
             const candidEncodedItems1 = globalThis._azleIc.stableBTreeMapItems(candidEncodedMemoryId21);
             return candidEncodedItems1.map((candidEncodedItem1)=>{
@@ -100045,6 +100072,9 @@ function StableBTreeMap(keyType1, valueType1, memoryId1) {
      * The keys for each element in the map in sorted order.
      * @returns they keys in the map.
      */ keys () {
+            if (globalThis._azleIc === void 0) {
+                return void 0;
+            }
             const candidEncodedMemoryId21 = encode3(nat8, memoryId1).buffer;
             const candidEncodedKeys1 = globalThis._azleIc.stableBTreeMapKeys(candidEncodedMemoryId21);
             return candidEncodedKeys1.map((candidEncodedKey1)=>{
@@ -100055,6 +100085,9 @@ function StableBTreeMap(keyType1, valueType1, memoryId1) {
      * Checks to see how many elements are in the map.
      * @returns the number of elements in the map.
      */ len () {
+            if (globalThis._azleIc === void 0) {
+                return void 0;
+            }
             const candidEncodedMemoryId21 = encode3(nat8, memoryId1).buffer;
             const candidEncodedLen1 = globalThis._azleIc.stableBTreeMapLen(candidEncodedMemoryId21);
             return decode3(nat64, candidEncodedLen1);
@@ -100064,6 +100097,9 @@ function StableBTreeMap(keyType1, valueType1, memoryId1) {
      * @param key the location from which to remove.
      * @returns the previous value at the key if it exists, `null` otherwise.
      */ remove (key1) {
+            if (globalThis._azleIc === void 0) {
+                return void 0;
+            }
             const candidEncodedMemoryId21 = encode3(nat8, memoryId1).buffer;
             const candidEncodedKey1 = encode3(keyType1, key1).buffer;
             const candidEncodedValue1 = globalThis._azleIc.stableBTreeMapRemove(candidEncodedMemoryId21, candidEncodedKey1);
@@ -100077,6 +100113,9 @@ function StableBTreeMap(keyType1, valueType1, memoryId1) {
      * The values in the map in sorted order.
      * @returns the values in the map.
      */ values () {
+            if (globalThis._azleIc === void 0) {
+                return void 0;
+            }
             const candidEncodedMemoryId21 = encode3(nat8, memoryId1).buffer;
             const candidEncodedValues1 = globalThis._azleIc.stableBTreeMapValues(candidEncodedMemoryId21);
             return candidEncodedValues1.map((candidEncodedValue1)=>{
@@ -100085,16 +100124,6 @@ function StableBTreeMap(keyType1, valueType1, memoryId1) {
         }
     };
 }
-// node_modules/azle/src/lib/system_types/rejection_code.ts
-var RejectionCode = Variant2({
-    NoError: Null2,
-    SysFatal: Null2,
-    SysTransient: Null2,
-    DestinationInvalid: Null2,
-    CanisterReject: Null2,
-    CanisterError: Null2,
-    Unknown: Null2
-});
 // node_modules/@dfinity/principal/lib/esm/utils/base32.js
 var alphabet2 = "abcdefghijklmnopqrstuvwxyz234567";
 var lookupTable2 = /* @__PURE__ */ Object.create(null);
@@ -100512,40 +100541,43 @@ var Principal4 = class _Principal {
     }
 };
 // src/backend/model.ts
-var Nft = Record2({
-    id: nat64,
-    creatorId: Principal3,
-    imageUrl: text,
-    imageMetadata: text,
-    createdAt: nat64
-});
-var Slot = Record2({
-    id: nat64,
-    userId: Principal3,
-    merchantId: text,
-    nftId: nat64,
-    claimed: bool,
-    createdAt: nat64
-});
 var User = Record2({
     id: Principal3,
-    slotIds: Vec2(nat64),
-    nftIds: Vec2(nat64),
     createdAt: nat64
 });
 var Merchant = Record2({
     uuid: text,
-    slotIds: Vec2(nat64),
-    collabCreators: Vec2(Principal3),
+    name: text,
+    lon: text,
+    lat: text,
+    collaborations: Vec2(Principal3),
     createdAt: nat64
 });
 var Creator = Record2({
     id: Principal3,
+    name: text,
+    city: text,
+    province: text,
     behance: text,
     flickr: text,
     instagram: text,
     reddit: text,
-    nftIds: Vec2(nat64),
+    createdAt: nat64
+});
+var Nft = Record2({
+    id: nat64,
+    imageUrl: text,
+    metadataUrl: text,
+    userId: Principal3,
+    creatorId: Principal3,
+    loyaltyId: nat64,
+    createdAt: nat64
+});
+var Loyalty = Record2({
+    id: nat64,
+    claimed: bool,
+    userId: Principal3,
+    merchantId: text,
     createdAt: nat64
 });
 // src/backend/index.ts
@@ -100554,97 +100586,22 @@ var Errors = Variant2({
     NftDoesNotExist: nat64,
     UserDoesNotExist: Principal3,
     MerchantDoesNotExist: text,
-    CreatorDoesNotExist: Principal3
+    CreatorDoesNotExist: Principal3,
+    LoyaltyDoesNotExist: nat64
 });
 var nftCounter = 0n;
+var loyaltyCounter = 0n;
 var nfts = StableBTreeMap(nat64, Nft, 0);
-var slots = StableBTreeMap(nat64, Slot, 1);
-var users = StableBTreeMap(Principal3, User, 2);
-var merchants = StableBTreeMap(text, Merchant, 3);
-var creators = StableBTreeMap(Principal3, Creator, 4);
+var users = StableBTreeMap(Principal3, User, 1);
+var merchants = StableBTreeMap(text, Merchant, 2);
+var creators = StableBTreeMap(Principal3, Creator, 3);
+var loyalties = StableBTreeMap(nat64, Loyalty, 4);
 var backend_default = Canister({
-    /* ---------------------------------- NFTS ---------------------------------- */ createNft: update([
-        Principal3,
-        text,
-        text
-    ], Nft, (creatorId1, imageUrl1, imageMetadata1)=>{
-        const nft1 = {
-            id: nftCounter,
-            creatorId: creatorId1,
-            imageUrl: imageUrl1,
-            imageMetadata: imageMetadata1,
-            createdAt: ic.time()
-        };
-        nfts.insert(nft1.id, nft1);
-        nftCounter++;
-        return nft1;
-    }),
-    readAllNfts: query([], Vec2(Nft), ()=>{
-        return nfts.values();
-    }),
-    readNft: query([
-        nat64
-    ], Opt2(Nft), (id21)=>{
-        return nfts.get(id21);
-    }),
-    deleteNft: update([
-        nat64
-    ], Result(Nft, Errors), (id21)=>{
-        const nftOpts1 = nfts.get(id21);
-        if ("None" in nftOpts1) {
-            return Err({
-                NftDoesNotExist: id21
-            });
-        }
-        const nft1 = nftOpts1.Some;
-        nfts.remove(nft1.id);
-        return Ok(nft1);
-    }),
-    /* ---------------------------------- Slots --------------------------------- */ createSlot: update([
-        nat64,
-        Principal3,
-        text,
-        nat64
-    ], Slot, (id21, userId1, merchantId1, nftId1)=>{
-        const slot1 = {
-            id: id21,
-            userId: userId1,
-            merchantId: merchantId1,
-            nftId: nftId1,
-            claimed: false,
-            createdAt: ic.time()
-        };
-        slots.insert(slot1.id, slot1);
-        return slot1;
-    }),
-    readAllSlots: query([], Vec2(Slot), ()=>{
-        return slots.values();
-    }),
-    readSlot: query([
-        nat64
-    ], Opt2(Slot), (id21)=>{
-        return slots.get(id21);
-    }),
-    deleteSlot: update([
-        nat64
-    ], Result(Slot, Errors), (id21)=>{
-        const slotOpts1 = slots.get(id21);
-        if ("None" in slotOpts1) {
-            return Err({
-                SlotDoesNotExist: id21
-            });
-        }
-        const slot1 = slotOpts1.Some;
-        slots.remove(slot1.id);
-        return Ok(slot1);
-    }),
     /* ---------------------------------- Users --------------------------------- */ createUser: update([
         Principal3
     ], User, (id21)=>{
         const user1 = {
             id: id21,
-            slotIds: [],
-            nftIds: [],
             createdAt: ic.time()
         };
         users.insert(user1.id, user1);
@@ -100668,21 +100625,21 @@ var backend_default = Canister({
             });
         }
         const user1 = userOpts1.Some;
-        user1.slotIds.forEach((slotId1)=>{
-            slots.remove(slotId1);
-        });
-        user1.nftIds.forEach((nftId1)=>{
-            nfts.remove(nftId1);
-        });
         users.remove(user1.id);
         return Ok(user1);
     }),
-    /* -------------------------------- Merchants ------------------------------- */ createMerchant: update([], Merchant, ()=>{
+    /* -------------------------------- Merchants ------------------------------- */ createMerchant: update([
+        text,
+        text,
+        text
+    ], Merchant, (name1, lon1, lat1)=>{
         const uuid1 = v4_default();
         const merchant1 = {
             uuid: uuid1,
-            slotIds: [],
-            collabCreators: [],
+            name: name1,
+            lon: lon1,
+            lat: lat1,
+            collaborations: [],
             createdAt: ic.time()
         };
         merchants.insert(merchant1.uuid, merchant1);
@@ -100706,9 +100663,6 @@ var backend_default = Canister({
             });
         }
         const merchant1 = merchantOpts1.Some;
-        merchant1.slotIds.forEach((slotId1)=>{
-            slots.remove(slotId1);
-        });
         merchants.remove(merchant1.uuid);
         return Ok(merchant1);
     }),
@@ -100716,16 +100670,21 @@ var backend_default = Canister({
         text,
         text,
         text,
+        text,
+        text,
+        text,
         text
-    ], Creator, (behance1, flickr1, instagram1, reddit1)=>{
+    ], Creator, (name1, city1, province1, behance1, flickr1, instagram1, reddit1)=>{
         const id21 = generateId();
         const creator1 = {
             id: id21,
+            name: name1,
+            city: city1,
+            province: province1,
             behance: behance1,
             flickr: flickr1,
             instagram: instagram1,
             reddit: reddit1,
-            nftIds: [],
             createdAt: ic.time()
         };
         creators.insert(creator1.id, creator1);
@@ -100749,11 +100708,162 @@ var backend_default = Canister({
             });
         }
         const creator1 = creatorOpts1.Some;
-        creator1.nftIds.forEach((nftId1)=>{
-            nfts.remove(nftId1);
-        });
         creators.remove(creator1.id);
         return Ok(creator1);
+    }),
+    /* ---------------------------------- NFTS ---------------------------------- */ createNft: update([
+        Principal3,
+        text,
+        text
+    ], Result(Nft, Errors), (creatorId1, imageUrl1, metadataUrl1)=>{
+        const creatorOpt1 = creators.get(creatorId1);
+        if ("None" in creatorOpt1) {
+            return Err({
+                CreatorDoesNotExist: creatorId1
+            });
+        }
+        const creator1 = creatorOpt1.Some;
+        const nft1 = {
+            id: nftCounter,
+            imageUrl: imageUrl1,
+            metadataUrl: metadataUrl1,
+            userId: creator1.id,
+            creatorId: creatorId1,
+            loyaltyId: 0n,
+            createdAt: ic.time()
+        };
+        nfts.insert(nft1.id, nft1);
+        nftCounter++;
+        return Ok(nft1);
+    }),
+    readAllNfts: query([], Vec2(Nft), ()=>{
+        return nfts.values();
+    }),
+    readNft: query([
+        nat64
+    ], Opt2(Nft), (id21)=>{
+        return nfts.get(id21);
+    }),
+    deleteNft: update([
+        nat64
+    ], Result(Nft, Errors), (id21)=>{
+        const nftOpts1 = nfts.get(id21);
+        if ("None" in nftOpts1) {
+            return Err({
+                NftDoesNotExist: id21
+            });
+        }
+        const nft1 = nftOpts1.Some;
+        nfts.remove(nft1.id);
+        return Ok(nft1);
+    }),
+    sendNft: update([
+        nat64,
+        Principal3,
+        nat64
+    ], Result(Nft, Errors), (nftId1, userId1, loyaltyId1)=>{
+        const nftOpts1 = nfts.get(nftId1);
+        if ("None" in nftOpts1) {
+            return Err({
+                NftDoesNotExist: nftId1
+            });
+        }
+        const nft1 = nftOpts1.Some;
+        const updatedNft1 = _extends({}, nft1, {
+            userId: userId1,
+            loyaltyId: loyaltyId1
+        });
+        nfts.insert(updatedNft1.id, updatedNft1);
+        return Ok(nft1);
+    }),
+    queryUserNft: query([
+        Principal3
+    ], Vec2(Nft), (userId1)=>{
+        return nfts.values().filter((nft1)=>{
+            nft1.userId.toText() === userId1.toText();
+        });
+    }),
+    queryCreatorNft: query([
+        Principal3
+    ], Vec2(Nft), (creatorId1)=>{
+        return nfts.values().filter((nft1)=>{
+            nft1.creatorId.toText() === creatorId1.toText();
+        });
+    }),
+    queryLoyaltyNft: query([
+        nat64
+    ], Vec2(Nft), (loyaltyId1)=>{
+        return nfts.values().filter((nft1)=>{
+            nft1.loyaltyId === loyaltyId1;
+        });
+    }),
+    /* --------------------------------- Loyalty -------------------------------- */ createLoyalty: update([
+        Principal3,
+        text
+    ], Loyalty, (userId1, merchantId1)=>{
+        const loyalty1 = {
+            id: loyaltyCounter,
+            claimed: false,
+            userId: userId1,
+            merchantId: merchantId1,
+            createdAt: ic.time()
+        };
+        loyalties.insert(loyalty1.id, loyalty1);
+        loyaltyCounter++;
+        return loyalty1;
+    }),
+    readAllLoyalties: query([], Vec2(Loyalty), ()=>{
+        return loyalties.values();
+    }),
+    readLoyalty: query([
+        nat64
+    ], Opt2(Loyalty), (loyaltyId1)=>{
+        return loyalties.get(loyaltyId1);
+    }),
+    deleteLoyalty: update([
+        nat64
+    ], Result(Loyalty, Errors), (id21)=>{
+        const loyaltyOpt1 = loyalties.get(id21);
+        if ("None" in loyaltyOpt1) {
+            return Err({
+                LoyaltyDoesNotExist: id21
+            });
+        }
+        const loyalty1 = loyaltyOpt1.Some;
+        loyalties.remove(id21);
+        return Ok(loyalty1);
+    }),
+    clearLoyalty: update([
+        nat64,
+        Principal3,
+        text
+    ], Result(Loyalty, Errors), (loyaltyId1, userId1, merchantId1)=>{
+        const loyaltyOpt1 = loyalties.get(loyaltyId1);
+        if ("None" in loyaltyOpt1) {
+            return Err({
+                LoyaltyDoesNotExist: loyaltyId1
+            });
+        }
+        const loyalty1 = loyaltyOpt1.Some;
+        loyalty1.claimed = true;
+        const newLoyalty1 = {
+            id: loyaltyCounter,
+            claimed: false,
+            userId: userId1,
+            merchantId: merchantId1,
+            createdAt: ic.time()
+        };
+        loyalties.insert(newLoyalty1.id, newLoyalty1);
+        loyaltyCounter++;
+        return Ok(loyalty1);
+    }),
+    queryLoyalty: update([
+        Principal3,
+        text
+    ], Vec2(Loyalty), (userId1, merchantId1)=>{
+        return loyalties.values().filter((loyalty1)=>{
+            loyalty1.userId.toText() === userId1.toText() && loyalty1.merchantId === merchantId1;
+        });
     })
 });
 function generateId() {

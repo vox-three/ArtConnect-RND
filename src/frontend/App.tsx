@@ -6,7 +6,7 @@ import logo from "./assets/dfinity.svg";
  * Connect2ic provides essential utilities for IC app development
  */
 import { createClient } from "@connect2ic/core";
-import { defaultProviders } from "@connect2ic/core/providers";
+import { InternetIdentity } from "@connect2ic/core/providers/internet-identity";
 import {
     ConnectButton,
     ConnectDialog,
@@ -36,8 +36,6 @@ import CustomerDashboard from "./pages/CustomerDashboard";
 import ClaimPage from "./pages/Claim";
 import BottomBar from "./components/BottomBar";
 
-
-
 const router = createBrowserRouter([
     {
         path: "/",
@@ -53,22 +51,21 @@ const router = createBrowserRouter([
     },
     {
         path: "/imageafterscan",
-        element: <ImageAfterScan/>,
+        element: <ImageAfterScan />,
     },
     {
         path: "/imagedetailpage",
-        element: <ImageDetailPage/>,
+        element: <ImageDetailPage />,
     },
     {
         path: "/customerdashboard",
-        element: <CustomerDashboard/>,
+        element: <CustomerDashboard />,
     },
     {
         path: "/claimpage",
-        element: <ClaimPage/>,
+        element: <ClaimPage />,
     },
 ]);
-
 
 function App() {
     return (
@@ -86,7 +83,7 @@ const client = createClient({
     canisters: {
         artconnect,
     },
-    providers: defaultProviders,
+    providers: [new InternetIdentity()],
     // globalProviderConfig: {
     //     dev: import.meta.env.DEV,
     // },
