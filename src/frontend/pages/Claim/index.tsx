@@ -2,12 +2,16 @@ import React from 'react'
 import { Grid, Button } from '@mui/material';
 import { Typography } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import YourIconLogo from '../../assets/rose.jpg'
+import YourIconLogo from '../../assets/rose.jpg';
+import BottomBar from "../../components/BottomBar";
+import Navbar from "../../components/Navbar";
+
 
 const ClaimPage = () => {
     
     return (
         <>
+            <Navbar/>
             <div className='afterscan-page'>
                 <Grid container>
                     <Grid item xs={12}>
@@ -60,6 +64,7 @@ const ClaimPage = () => {
                     </Grid>
                 </Grid>
             </div>
+            <BottomBar/>
         </>
     )
 }

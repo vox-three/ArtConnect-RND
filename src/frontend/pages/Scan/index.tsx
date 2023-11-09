@@ -1,7 +1,9 @@
-import { Button } from "@mui/material";
+import { BottomNavigation, Button } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Grid from '@mui/material/Grid';
+import BottomBar from "../../components/BottomBar";
+import Navbar from "../../components/Navbar";
 
 export default function Scan() {
     const navigateScan = useNavigate();
@@ -16,6 +18,7 @@ export default function Scan() {
 
     return (
         <>
+            <Navbar/>
             <div className="scan-page">
                 <Grid container>
                     <Grid item xs={12} style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop:'20px'}}>
@@ -40,6 +43,7 @@ export default function Scan() {
                     </Grid>
                 </Grid>
             </div>
+            <BottomBar/>
         </>
     );
 }

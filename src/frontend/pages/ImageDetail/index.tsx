@@ -5,10 +5,13 @@ import { right } from '@popperjs/core';
 import { Button } from '@mui/material';
 import ShareIcon from '@mui/icons-material/Share';
 import YourIconLogo from '../../assets/rose.jpg'
+import BottomBar from "../../components/BottomBar";
+import Navbar from "../../components/Navbar";
 
 const ImageDetailPage = () => {
     return (
         <>
+            <Navbar/>
             <div className='imagedetail-page'>
                 <Grid container>
                     <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
@@ -43,7 +46,7 @@ const ImageDetailPage = () => {
                             Share
                         </Button>
                     </Grid>
-                    <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center', marginTop:'20px', paddingBottom:'20px' }}>
+                    <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center', marginTop:'20px', paddingBottom:'100px' }}>
                         <Button
                             variant="contained"
                             className='button-explore'
@@ -56,6 +59,7 @@ const ImageDetailPage = () => {
                     </Grid>
                 </Grid>
             </div>
+            <BottomBar/>
         </>
     )
 }

@@ -1,6 +1,7 @@
 import React from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import {AppBar, Toolbar, IconButton} from "@mui/material";
+import { AppBar, Toolbar, IconButton } from "@mui/material";
+import LogoArtConnect from '../../assets/Logo_ArtConnect.png'
 
 /*
  * Connect2ic provides essential utilities for IC app development
@@ -26,28 +27,29 @@ export default function Login() {
     return (
         <div>
             {isConnected && <Navigate to="/scan" />}
-            <Container maxWidth="sm">
             <div className="login-page">
                 <Grid container>
-                    <Grid item xs>
-                        <div className="login-container">
-                            <div className="logo-section">
-                                Art Connect
-                            </div>
-                            <span>Login to ArtConnect to open a surprise</span>
-                            <div className="login-button">
-                                <ConnectButton
-                                    onConnect={() => {
-                                        navigate("/scan");
-                                    }}
-                                />
-                            </div>
-                            <ConnectDialog />
+                    <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '100px' }}>
+                        <div className="logo-section">
+                            <img src={LogoArtConnect} alt="" />
                         </div>
+                    </Grid>
+                    <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px' }}>
+                        <span>Login to ArtConnect to open a surprise</span>
+                    </Grid>
+                    <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px' }}>
+                        <div className="login-button">
+                            <ConnectButton
+                                onConnect={() => {
+                                    navigate("/scan");
+                                }}
+                            />
+                        </div>
+                        <ConnectDialog />
                     </Grid>
                 </Grid>
             </div>
-            </Container>
         </div>
     );
 }
+

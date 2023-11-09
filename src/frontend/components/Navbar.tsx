@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem, Avatar } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useNavigate } from "react-router-dom";
 
 import YourIconLogo from '../assets/Logo_ArtConnect.png';
@@ -16,21 +17,21 @@ const Navbar = () => {
       setAnchorEl(null);
     };
 
-    const navigate = useNavigate();
-    const redirectScan = () => {
-        navigate("/scan");
-    };
+    // const navigate = useNavigate();
+    // const redirectScan = () => {
+    //     navigate("/scan");
+    // };
 
-    const navigateHome = useNavigate();
-    const redirectHome = () => {
-        navigateHome("/");
-    };
+    // const navigateHome = useNavigate();
+    // const redirectHome = () => {
+    //     navigateHome("/");
+    // };
 
 
-    const navigateCollection = useNavigate();
-    const redirectCollection = () => {
-        navigateCollection("/customerdashboard");
-    };
+    // const navigateCollection = useNavigate();
+    // const redirectCollection = () => {
+    //     navigateCollection("/customerdashboard");
+    // };
   
     return (
       <AppBar position="static" className='navbar'>
@@ -44,25 +45,21 @@ const Navbar = () => {
             marginRight: '20px', // Add spacing between the logo and other elements
           }}
         />
-          <Typography variant="h6">Your Logo</Typography>
           <IconButton
             edge="end"
             color="inherit"
             aria-label="menu"
             onClick={handleMenuClick}
-            className='hamburger-icon'
+            className='account-icon'
           >
-            <MenuIcon />
+            <AccountCircleIcon fontSize='large' />
           </IconButton>
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <MenuItem onClick={redirectHome}>Home</MenuItem>
-            <MenuItem onClick={redirectScan}>Scan</MenuItem>
-            <MenuItem onClick={redirectCollection}>Collection</MenuItem>
-            <MenuItem onClick={handleClose}>Log Out</MenuItem>
+            <MenuItem>Log Out</MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>
