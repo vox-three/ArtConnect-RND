@@ -3,8 +3,8 @@ import React from "react";
 // import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import { BottomNavigation, BottomNavigationAction } from "@mui/material";
 import ImageIcon from "@mui/icons-material/Image"; // Ikon gambar dari MUI
-import BarcodeIcon from "@mui/icons-material/QrCode"; // Ikon barcode dari MUI
-import RewardIcon from "@mui/icons-material/Redeem"; // Ikon reward dari MUI
+import CropFreeIcon from '@mui/icons-material/CropFree';
+import GradeIcon from '@mui/icons-material/Grade';
 import { useNavigate, Link, useLocation } from "react-router-dom";
 
 const BottomBar = () => {
@@ -31,7 +31,7 @@ const BottomBar = () => {
             <BottomNavigationAction
                 className="hover-bottom-navigation"
                 label="Scan"
-                icon={<BarcodeIcon style={{ color: "orange", fontSize: 32 }} />}
+                icon={<CropFreeIcon style={{ color: "orange", fontSize:'32' }} />}
                 component={Link}
                 to="/scan"
                 value="/scan"
@@ -39,10 +39,10 @@ const BottomBar = () => {
             <BottomNavigationAction
                 className="hover-bottom-navigation"
                 label="Reward"
-                icon={<RewardIcon style={{ color: "orange" }} />}
+                icon={<GradeIcon style={{ color: "orange" }} />}
                 component={Link}
-                to="/claimpage"
-                value="/claimpage"
+                to="/transactionlistpage"
+                value="/transactionlistpage"
             />
         </BottomNavigation>
     );

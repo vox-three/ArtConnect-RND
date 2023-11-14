@@ -35,6 +35,7 @@ import ImageDetailPage from "./pages/ImageDetail";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import ClaimPage from "./pages/Claim";
 import BottomBar from "./components/BottomBar";
+import TransactionList from "./pages/TransactionList";
 
 const router = createBrowserRouter([
     {
@@ -64,6 +65,10 @@ const router = createBrowserRouter([
     {
         path: "/claimpage",
         element: <ClaimPage />,
+    },
+    {
+        path: "/transactionlistpage",
+        element: <TransactionList />,
     },
 ]);
 
