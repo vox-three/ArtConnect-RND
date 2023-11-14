@@ -127,6 +127,10 @@ button {
     text-align: center !important;
     padding-top: 20px;
 }
+.sub-title{
+    text-align: center !important;
+    padding-top: 20px;
+}
 
 .title-map{
     display: flex;
