@@ -9,7 +9,7 @@ import Navbar from "../../components/Navbar";
 import { QrReader } from "react-qr-reader";
 
 export default function Scan() {
-    const [isShowScanner, setIsShowScanner] = useState(false);
+    const [isShowScanner, setIsShowScanner] = useState(true);
 
     const navigate = useNavigate();
     const redirectScan = () => {
@@ -58,29 +58,6 @@ export default function Scan() {
                                 }}
                             />
                         )}
-                    </Grid>
-                    <Grid
-                        item
-                        xs={12}
-                        style={{ display: "flex", justifyContent: "center", alignItems: "center" }}
-                    >
-                        <Button className="button-scan" onClick={showScanner}>
-                            Scan My Surprise
-                        </Button>
-                    </Grid>
-                    <Grid
-                        item
-                        xs={12}
-                        style={{ display: "flex", justifyContent: "center", alignItems: "center" }}
-                    >
-                        <Button
-                            className="button-collection"
-                            onClick={() => {
-                                redirectCollection();
-                            }}
-                        >
-                            See My Collection
-                        </Button>
                     </Grid>
                 </Grid>
             </div>
