@@ -51,6 +51,13 @@ export default function Scan() {
                                         navigate("/imageafterscan", {
                                             state: { url: result.getText() },
                                         });
+                                        
+                                        if(localStorage.getItem('scanCount') == null){
+                                            localStorage.setItem('scanCount','0');
+                                        }
+                                        const scan = (parseInt(localStorage.getItem('scanCount'))+1);
+                                        localStorage.setItem("scanCount", scan.toString());
+                                        
                                     }
                                     if (!!error) {
                                         console.info(error);

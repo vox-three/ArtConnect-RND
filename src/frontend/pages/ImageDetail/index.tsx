@@ -1,17 +1,36 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Grid from '@mui/material/Grid';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { right } from '@popperjs/core';
-import { Button } from '@mui/material';
+import { Button, Dialog, DialogTitle } from '@mui/material';
 import ShareIcon from '@mui/icons-material/Share';
-import YourIconLogo from '../../assets/rose.jpg'
 import BottomBar from "../../components/BottomBar";
 import Navbar from "../../components/Navbar";
+import { useLocation } from "react-router-dom";
+import { FacebookShareButton, TwitterShareButton, WhatsappShareButton } from 'react-share';
+import { FacebookIcon, TwitterIcon, WhatsappIcon } from 'react-share';
 
 const ImageDetailPage = () => {
+
+    const { state } = useLocation();
+    console.log(state.imgurl);
+
+    const [open, setOpen] = useState(false);
+
+    const handleOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const shareUrl = state.imgurl;
+    const title = 'Share NFT, ';
+
     return (
         <>
-            <Navbar/>
+            <Navbar />
             <div className='imagedetail-page'>
                 <Grid container>
                     <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
@@ -19,7 +38,7 @@ const ImageDetailPage = () => {
                     </Grid>
                     <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
                         <div className='wrap-image-scan'>
-                            <img src={YourIconLogo} alt="" />
+                            <img src={state.imgurl} alt="" />
                         </div>
                     </Grid>
                     <Grid item xs={6} style={{ paddingRight: '20px', marginTop: '20px' }}>
@@ -39,14 +58,31 @@ const ImageDetailPage = () => {
                             variant="contained"
                             className='button-share'
                             startIcon={<ShareIcon />}
-                            onClick={() => {
-                                // Add your share functionality here
-                            }}
+                            onClick={handleOpen}
                         >
                             Share
                         </Button>
+
+                        <Dialog open={open} onClose={handleClose}>
+                            <Grid container style={{ padding:'20px'}}>
+                                <Grid item xs={12}>
+                                    <p style={{ fontWeight:'bold', fontSize:'24px', textAlign:'center' }}>Share</p>
+                                </Grid>
+                                <Grid item xs={12} style={{ display:'flex', justifyContent:'center' }}>
+                                    <FacebookShareButton url={shareUrl} quote={title}>
+                                        <FacebookIcon style={{ width:'50px', height:'50px' }} round={true}></FacebookIcon>
+                                    </FacebookShareButton>
+                                    <TwitterShareButton url={shareUrl} title={title}>
+                                       <TwitterIcon round={true} style={{ width:'50px', height:'50px', marginLeft:'5px' }}></TwitterIcon>
+                                    </TwitterShareButton>
+                                    <WhatsappShareButton url={shareUrl} title={title}>
+                                       <WhatsappIcon round={true} style={{ width:'50px', height:'50px', marginLeft:'5px' }}></WhatsappIcon>
+                                    </WhatsappShareButton>
+                                </Grid>
+                            </Grid>
+                        </Dialog>
                     </Grid>
-                    <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center', marginTop:'20px', paddingBottom:'100px' }}>
+                    <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', paddingBottom: '100px' }}>
                         <Button
                             variant="contained"
                             className='button-explore'
@@ -54,12 +90,12 @@ const ImageDetailPage = () => {
                                 // Add your share functionality here
                             }}
                         >
-                           Explore Poppy's Art & Collaborations
+                            Explore Poppy's Art & Collaborations
                         </Button>
                     </Grid>
                 </Grid>
             </div>
-            <BottomBar/>
+            <BottomBar />
         </>
     )
 }
