@@ -204,5 +204,19 @@ button {
     cursor: pointer !important;
 }
 
+.button-transaction{
+    width: 80px !important;
+    height: 40px !important;
+    background-color: #E8833A !important;
+    color: white !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+}
+
+.button-disable{
+    background-color: #F3DAC6 !important;
+    color: #F5E2D3 !important;
+}
+
 
 
