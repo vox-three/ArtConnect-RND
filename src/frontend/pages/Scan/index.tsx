@@ -13,7 +13,7 @@ import { QrReader } from "react-qr-reader";
 import { artconnect } from "../../../../.dfx/local/canisters/artconnect";
 
 export default function Scan() {
-    const [isShowScanner, setIsShowScanner] = useState(false);
+    const [isShowScanner, setIsShowScanner] = useState(true);
 
     const navigate = useNavigate();
 
@@ -104,6 +104,13 @@ export default function Scan() {
                                         navigate("/imageafterscan", {
                                             state: { url: result.getText() },
                                         });
+                                        
+                                        if(localStorage.getItem('scanCount') == null){
+                                            localStorage.setItem('scanCount','0');
+                                        }
+                                        const scan = (parseInt(localStorage.getItem('scanCount'))+1);
+                                        localStorage.setItem("scanCount", scan.toString());
+                                        
                                     }
                                     if (!!error) {
                                         console.info(error);
@@ -111,29 +118,6 @@ export default function Scan() {
                                 }}
                             />
                         )}
-                    </Grid>
-                    <Grid
-                        item
-                        xs={12}
-                        style={{ display: "flex", justifyContent: "center", alignItems: "center" }}
-                    >
-                        <Button className="button-scan" onClick={showScanner}>
-                            Scan My Surprise
-                        </Button>
-                    </Grid>
-                    <Grid
-                        item
-                        xs={12}
-                        style={{ display: "flex", justifyContent: "center", alignItems: "center" }}
-                    >
-                        <Button
-                            className="button-collection"
-                            onClick={() => {
-                                navigate("/customerdashboard");
-                            }}
-                        >
-                            See My Collection
-                        </Button>
                     </Grid>
                 </Grid>
             </div>

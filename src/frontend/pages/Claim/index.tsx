@@ -16,7 +16,7 @@ const ClaimPage = () => {
                         <h1 className='title'>Congratulation! <br /> Reward Claimed!</h1>
                     </Grid>
                     <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <StarsIcon data-aos="zoom-in" style={{ color:'E8833A', fontSize:'200px' }} />
+                        <StarsIcon data-aos="zoom-in" style={{ color:'#E8833A', fontSize:'200px' }} />
                     </Grid>
                     <Grid item xs={12}>
                         <p className='sub-title'>You've claimed 5 NFT from <b>Honney Coffee</b></p>

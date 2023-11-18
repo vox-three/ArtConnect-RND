@@ -15,8 +15,8 @@ const ImageAfterScan = () => {
     console.log(location.state.url);
 
     const navigateDetailPage = useNavigate();
-    const redirectDetailPage = () => {
-        navigateDetailPage("/imagedetailpage");
+    const redirectDetailPage = (imgurl) => {
+        navigateDetailPage("/imagedetailpage", {state:{imgurl:imgurl}});
     };
     return (
         <>
@@ -60,7 +60,7 @@ const ImageAfterScan = () => {
                         <Button
                             className="button-collection"
                             onClick={() => {
-                                redirectDetailPage();
+                                redirectDetailPage(location.state.url);
                             }}
                         >
                             See Details
