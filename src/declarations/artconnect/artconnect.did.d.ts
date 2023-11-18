@@ -2,102 +2,91 @@ import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
 
 export interface _SERVICE {
+  'addTransaction' : ActorMethod<
+    [bigint],
+    {
+        'Ok' : {
+          'id' : bigint,
+          'userId' : Principal,
+          'createdAt' : bigint,
+          'merchantId' : string,
+          'claimed' : boolean,
+          'transactions' : bigint,
+        }
+      } |
+      {
+        'Err' : { 'MerchantDoesNotExist' : string } |
+          { 'SlotDoesNotExist' : bigint } |
+          { 'NftDoesNotExist' : bigint } |
+          { 'CreatorDoesNotExist' : Principal } |
+          { 'LoyaltyDoesNotExist' : bigint } |
+          { 'UserDoesNotExist' : Principal }
+      }
+  >,
+  'clearLoyalty' : ActorMethod<
+    [bigint, Principal, string],
+    {
+        'Ok' : {
+          'id' : bigint,
+          'userId' : Principal,
+          'createdAt' : bigint,
+          'merchantId' : string,
+          'claimed' : boolean,
+          'transactions' : bigint,
+        }
+      } |
+      {
+        'Err' : { 'MerchantDoesNotExist' : string } |
+          { 'SlotDoesNotExist' : bigint } |
+          { 'NftDoesNotExist' : bigint } |
+          { 'CreatorDoesNotExist' : Principal } |
+          { 'LoyaltyDoesNotExist' : bigint } |
+          { 'UserDoesNotExist' : Principal }
+      }
+  >,
   'createCreator' : ActorMethod<
-    [string, string, string, string],
+    [string, string, string, string, string, string, string],
     {
       'id' : Principal,
-      'nftIds' : BigUint64Array | bigint[],
+      'province' : string,
       'flickr' : string,
+      'city' : string,
       'instagram' : string,
+      'name' : string,
       'createdAt' : bigint,
       'behance' : string,
       'reddit' : string,
     }
   >,
-  'createMerchant' : ActorMethod<
-    [],
-    {
-      'slotIds' : BigUint64Array | bigint[],
-      'collabCreators' : Array<Principal>,
-      'createdAt' : bigint,
-      'uuid' : string,
-    }
-  >,
-  'createNft' : ActorMethod<
-    [Principal, string, string],
-    {
-      'id' : bigint,
-      'imageMetadata' : string,
-      'createdAt' : bigint,
-      'creatorId' : Principal,
-      'imageUrl' : string,
-    }
-  >,
-  'createSlot' : ActorMethod<
-    [bigint, Principal, string, bigint],
+  'createLoyalty' : ActorMethod<
+    [string],
     {
       'id' : bigint,
       'userId' : Principal,
       'createdAt' : bigint,
       'merchantId' : string,
       'claimed' : boolean,
-      'nftId' : bigint,
+      'transactions' : bigint,
     }
   >,
-  'createUser' : ActorMethod<
-    [Principal],
+  'createMerchant' : ActorMethod<
+    [string, string, string],
     {
-      'id' : Principal,
-      'nftIds' : BigUint64Array | bigint[],
-      'slotIds' : BigUint64Array | bigint[],
+      'lat' : string,
+      'lon' : string,
+      'name' : string,
       'createdAt' : bigint,
+      'uuid' : string,
+      'collaborations' : Array<Principal>,
     }
   >,
-  'deleteCreator' : ActorMethod<
-    [Principal],
-    {
-        'Ok' : {
-          'id' : Principal,
-          'nftIds' : BigUint64Array | bigint[],
-          'flickr' : string,
-          'instagram' : string,
-          'createdAt' : bigint,
-          'behance' : string,
-          'reddit' : string,
-        }
-      } |
-      {
-        'Err' : { 'MerchantDoesNotExist' : string } |
-          { 'SlotDoesNotExist' : bigint } |
-          { 'NftDoesNotExist' : bigint } |
-          { 'CreatorDoesNotExist' : Principal } |
-          { 'UserDoesNotExist' : Principal }
-      }
-  >,
-  'deleteMerchant' : ActorMethod<
-    [string],
-    {
-        'Ok' : {
-          'slotIds' : BigUint64Array | bigint[],
-          'collabCreators' : Array<Principal>,
-          'createdAt' : bigint,
-          'uuid' : string,
-        }
-      } |
-      {
-        'Err' : { 'MerchantDoesNotExist' : string } |
-          { 'SlotDoesNotExist' : bigint } |
-          { 'NftDoesNotExist' : bigint } |
-          { 'CreatorDoesNotExist' : Principal } |
-          { 'UserDoesNotExist' : Principal }
-      }
-  >,
-  'deleteNft' : ActorMethod<
-    [bigint],
+  'createNft' : ActorMethod<
+    [Principal, string, string],
     {
         'Ok' : {
           'id' : bigint,
-          'imageMetadata' : string,
+          'metadataUrl' : string,
+          'userId' : Principal,
           'createdAt' : bigint,
           'creatorId' : Principal,
           'imageUrl' : string,
@@ -108,10 +97,36 @@ export interface _SERVICE {
           { 'SlotDoesNotExist' : bigint } |
           { 'NftDoesNotExist' : bigint } |
           { 'CreatorDoesNotExist' : Principal } |
+          { 'LoyaltyDoesNotExist' : bigint } |
           { 'UserDoesNotExist' : Principal }
       }
   >,
-  'deleteSlot' : ActorMethod<
+  'createUser' : ActorMethod<[], { 'id' : Principal, 'createdAt' : bigint }>,
+  'deleteCreator' : ActorMethod<
+    [Principal],
+    {
+        'Ok' : {
+          'id' : Principal,
+          'province' : string,
+          'flickr' : string,
+          'city' : string,
+          'instagram' : string,
+          'name' : string,
+          'createdAt' : bigint,
+          'behance' : string,
+          'reddit' : string,
+        }
+      } |
+      {
+        'Err' : { 'MerchantDoesNotExist' : string } |
+          { 'SlotDoesNotExist' : bigint } |
+          { 'NftDoesNotExist' : bigint } |
+          { 'CreatorDoesNotExist' : Principal } |
+          { 'LoyaltyDoesNotExist' : bigint } |
+          { 'UserDoesNotExist' : Principal }
+      }
+  >,
+  'deleteLoyalty' : ActorMethod<
     [bigint],
     {
         'Ok' : {
@@ -120,7 +135,7 @@ export interface _SERVICE {
           'createdAt' : bigint,
           'merchantId' : string,
           'claimed' : boolean,
-          'nftId' : bigint,
+          'transactions' : bigint,
         }
       } |
       {
@@ -128,38 +143,142 @@ export interface _SERVICE {
           { 'SlotDoesNotExist' : bigint } |
           { 'NftDoesNotExist' : bigint } |
           { 'CreatorDoesNotExist' : Principal } |
+          { 'LoyaltyDoesNotExist' : bigint } |
+          { 'UserDoesNotExist' : Principal }
+      }
+  >,
+  'deleteMerchant' : ActorMethod<
+    [string],
+    {
+        'Ok' : {
+          'lat' : string,
+          'lon' : string,
+          'name' : string,
+          'createdAt' : bigint,
+          'uuid' : string,
+          'collaborations' : Array<Principal>,
+        }
+      } |
+      {
+        'Err' : { 'MerchantDoesNotExist' : string } |
+          { 'SlotDoesNotExist' : bigint } |
+          { 'NftDoesNotExist' : bigint } |
+          { 'CreatorDoesNotExist' : Principal } |
+          { 'LoyaltyDoesNotExist' : bigint } |
+          { 'UserDoesNotExist' : Principal }
+      }
+  >,
+  'deleteNft' : ActorMethod<
+    [bigint],
+    {
+        'Ok' : {
+          'id' : bigint,
+          'metadataUrl' : string,
+          'userId' : Principal,
+          'createdAt' : bigint,
+          'creatorId' : Principal,
+          'imageUrl' : string,
+        }
+      } |
+      {
+        'Err' : { 'MerchantDoesNotExist' : string } |
+          { 'SlotDoesNotExist' : bigint } |
+          { 'NftDoesNotExist' : bigint } |
+          { 'CreatorDoesNotExist' : Principal } |
+          { 'LoyaltyDoesNotExist' : bigint } |
           { 'UserDoesNotExist' : Principal }
       }
   >,
   'deleteUser' : ActorMethod<
     [Principal],
-    {
-        'Ok' : {
-          'id' : Principal,
-          'nftIds' : BigUint64Array | bigint[],
-          'slotIds' : BigUint64Array | bigint[],
-          'createdAt' : bigint,
-        }
-      } |
+    { 'Ok' : { 'id' : Principal, 'createdAt' : bigint } } |
       {
         'Err' : { 'MerchantDoesNotExist' : string } |
           { 'SlotDoesNotExist' : bigint } |
           { 'NftDoesNotExist' : bigint } |
           { 'CreatorDoesNotExist' : Principal } |
+          { 'LoyaltyDoesNotExist' : bigint } |
           { 'UserDoesNotExist' : Principal }
       }
+  >,
+  'queryCreatorNft' : ActorMethod<
+    [Principal],
+    Array<
+      {
+        'id' : bigint,
+        'metadataUrl' : string,
+        'userId' : Principal,
+        'createdAt' : bigint,
+        'creatorId' : Principal,
+        'imageUrl' : string,
+      }
+    >
+  >,
+  'queryLoyalty' : ActorMethod<
+    [Principal, string],
+    Array<
+      {
+        'id' : bigint,
+        'userId' : Principal,
+        'createdAt' : bigint,
+        'merchantId' : string,
+        'claimed' : boolean,
+        'transactions' : bigint,
+      }
+    >
+  >,
+  'queryLoyaltyNft' : ActorMethod<
+    [bigint],
+    Array<
+      {
+        'id' : bigint,
+        'metadataUrl' : string,
+        'userId' : Principal,
+        'createdAt' : bigint,
+        'creatorId' : Principal,
+        'imageUrl' : string,
+      }
+    >
+  >,
+  'queryUserNft' : ActorMethod<
+    [],
+    Array<
+      {
+        'id' : bigint,
+        'metadataUrl' : string,
+        'userId' : Principal,
+        'createdAt' : bigint,
+        'creatorId' : Principal,
+        'imageUrl' : string,
+      }
+    >
   >,
   'readAllCreators' : ActorMethod<
     [],
     Array<
       {
         'id' : Principal,
-        'nftIds' : BigUint64Array | bigint[],
+        'province' : string,
         'flickr' : string,
+        'city' : string,
         'instagram' : string,
+        'name' : string,
         'createdAt' : bigint,
         'behance' : string,
         'reddit' : string,
+      }
+    >
+  >,
+  'readAllLoyalties' : ActorMethod<
+    [],
+    Array<
+      {
+        'id' : bigint,
+        'userId' : Principal,
+        'createdAt' : bigint,
+        'merchantId' : string,
+        'claimed' : boolean,
+        'transactions' : bigint,
       }
     >
   >,
@@ -167,10 +286,12 @@ export interface _SERVICE {
     [],
     Array<
       {
-        'slotIds' : BigUint64Array | bigint[],
-        'collabCreators' : Array<Principal>,
+        'lat' : string,
+        'lon' : string,
+        'name' : string,
         'createdAt' : bigint,
         'uuid' : string,
+        'collaborations' : Array<Principal>,
       }
     >
   >,
@@ -179,48 +300,44 @@ export interface _SERVICE {
     Array<
       {
         'id' : bigint,
-        'imageMetadata' : string,
+        'metadataUrl' : string,
+        'userId' : Principal,
         'createdAt' : bigint,
         'creatorId' : Principal,
         'imageUrl' : string,
       }
     >
   >,
-  'readAllSlots' : ActorMethod<
-    [],
-    Array<
-      {
-        'id' : bigint,
-        'userId' : Principal,
-        'createdAt' : bigint,
-        'merchantId' : string,
-        'claimed' : boolean,
-        'nftId' : bigint,
-      }
-    >
-  >,
   'readAllUsers' : ActorMethod<
     [],
-    Array<
-      {
-        'id' : Principal,
-        'nftIds' : BigUint64Array | bigint[],
-        'slotIds' : BigUint64Array | bigint[],
-        'createdAt' : bigint,
-      }
-    >
+    Array<{ 'id' : Principal, 'createdAt' : bigint }>
   >,
   'readCreator' : ActorMethod<
     [Principal],
     [] | [
       {
         'id' : Principal,
-        'nftIds' : BigUint64Array | bigint[],
+        'province' : string,
         'flickr' : string,
+        'city' : string,
         'instagram' : string,
+        'name' : string,
         'createdAt' : bigint,
         'behance' : string,
         'reddit' : string,
+      }
+    ]
+  >,
+  'readLoyalty' : ActorMethod<
+    [bigint],
+    [] | [
+      {
+        'id' : bigint,
+        'userId' : Principal,
+        'createdAt' : bigint,
+        'merchantId' : string,
+        'claimed' : boolean,
+        'transactions' : bigint,
       }
     ]
   >,
@@ -228,10 +345,12 @@ export interface _SERVICE {
     [string],
     [] | [
       {
-        'slotIds' : BigUint64Array | bigint[],
-        'collabCreators' : Array<Principal>,
+        'lat' : string,
+        'lon' : string,
+        'name' : string,
         'createdAt' : bigint,
         'uuid' : string,
+        'collaborations' : Array<Principal>,
       }
     ]
   >,
@@ -240,35 +359,37 @@ export interface _SERVICE {
     [] | [
       {
         'id' : bigint,
-        'imageMetadata' : string,
+        'metadataUrl' : string,
+        'userId' : Principal,
         'createdAt' : bigint,
         'creatorId' : Principal,
         'imageUrl' : string,
       }
     ]
   >,
-  'readSlot' : ActorMethod<
-    [bigint],
-    [] | [
-      {
-        'id' : bigint,
-        'userId' : Principal,
-        'createdAt' : bigint,
-        'merchantId' : string,
-        'claimed' : boolean,
-        'nftId' : bigint,
-      }
-    ]
-  >,
   'readUser' : ActorMethod<
-    [Principal],
-    [] | [
+    [],
+    [] | [{ 'id' : Principal, 'createdAt' : bigint }]
+  >,
+  'sendNft' : ActorMethod<
+    [bigint],
+    {
+        'Ok' : {
+          'id' : bigint,
+          'metadataUrl' : string,
+          'userId' : Principal,
+          'createdAt' : bigint,
+          'creatorId' : Principal,
+          'imageUrl' : string,
+        }
+      } |
       {
-        'id' : Principal,
-        'nftIds' : BigUint64Array | bigint[],
-        'slotIds' : BigUint64Array | bigint[],
-        'createdAt' : bigint,
+        'Err' : { 'MerchantDoesNotExist' : string } |
+          { 'SlotDoesNotExist' : bigint } |
+          { 'NftDoesNotExist' : bigint } |
+          { 'CreatorDoesNotExist' : Principal } |
+          { 'LoyaltyDoesNotExist' : bigint } |
+          { 'UserDoesNotExist' : Principal }
       }
-    ]
   >,
 }

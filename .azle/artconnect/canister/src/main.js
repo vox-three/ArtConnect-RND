@@ -100570,11 +100570,11 @@ var Nft = Record2({
     metadataUrl: text,
     userId: Principal3,
     creatorId: Principal3,
-    loyaltyId: nat64,
     createdAt: nat64
 });
 var Loyalty = Record2({
     id: nat64,
+    transactions: nat64,
     claimed: bool,
     userId: Principal3,
     merchantId: text,
@@ -100597,11 +100597,9 @@ var merchants = StableBTreeMap(text, Merchant, 2);
 var creators = StableBTreeMap(Principal3, Creator, 3);
 var loyalties = StableBTreeMap(nat64, Loyalty, 4);
 var backend_default = Canister({
-    /* ---------------------------------- Users --------------------------------- */ createUser: update([
-        Principal3
-    ], User, (id21)=>{
+    /* ---------------------------------- Users --------------------------------- */ createUser: update([], User, ()=>{
         const user1 = {
-            id: id21,
+            id: ic.caller(),
             createdAt: ic.time()
         };
         users.insert(user1.id, user1);
@@ -100610,10 +100608,8 @@ var backend_default = Canister({
     readAllUsers: query([], Vec2(User), ()=>{
         return users.values();
     }),
-    readUser: query([
-        Principal3
-    ], Opt2(User), (id21)=>{
-        return users.get(id21);
+    readUser: query([], Opt2(User), ()=>{
+        return users.get(ic.caller());
     }),
     deleteUser: update([
         Principal3
@@ -100729,7 +100725,6 @@ var backend_default = Canister({
             metadataUrl: metadataUrl1,
             userId: creator1.id,
             creatorId: creatorId1,
-            loyaltyId: 0n,
             createdAt: ic.time()
         };
         nfts.insert(nft1.id, nft1);
@@ -100758,10 +100753,8 @@ var backend_default = Canister({
         return Ok(nft1);
     }),
     sendNft: update([
-        nat64,
-        Principal3,
         nat64
-    ], Result(Nft, Errors), (nftId1, userId1, loyaltyId1)=>{
+    ], Result(Nft, Errors), (nftId1)=>{
         const nftOpts1 = nfts.get(nftId1);
         if ("None" in nftOpts1) {
             return Err({
@@ -100769,18 +100762,16 @@ var backend_default = Canister({
             });
         }
         const nft1 = nftOpts1.Some;
+        const userId1 = ic.caller();
         const updatedNft1 = _extends({}, nft1, {
-            userId: userId1,
-            loyaltyId: loyaltyId1
+            userId: userId1
         });
         nfts.insert(updatedNft1.id, updatedNft1);
         return Ok(nft1);
     }),
-    queryUserNft: query([
-        Principal3
-    ], Vec2(Nft), (userId1)=>{
+    queryUserNft: query([], Vec2(Nft), ()=>{
         return nfts.values().filter((nft1)=>{
-            nft1.userId.toText() === userId1.toText();
+            nft1.userId.toText() === ic.caller().toText();
         });
     }),
     queryCreatorNft: query([
@@ -100798,13 +100789,13 @@ var backend_default = Canister({
         });
     }),
     /* --------------------------------- Loyalty -------------------------------- */ createLoyalty: update([
-        Principal3,
         text
-    ], Loyalty, (userId1, merchantId1)=>{
+    ], Loyalty, (merchantId1)=>{
         const loyalty1 = {
             id: loyaltyCounter,
+            transactions: 0n,
             claimed: false,
-            userId: userId1,
+            userId: ic.caller(),
             merchantId: merchantId1,
             createdAt: ic.time()
         };
@@ -100822,22 +100813,22 @@ var backend_default = Canister({
     }),
     deleteLoyalty: update([
         nat64
-    ], Result(Loyalty, Errors), (id21)=>{
-        const loyaltyOpt1 = loyalties.get(id21);
+    ], Result(Loyalty, Errors), (loyaltyId1)=>{
+        const loyaltyOpt1 = loyalties.get(loyaltyId1);
         if ("None" in loyaltyOpt1) {
             return Err({
-                LoyaltyDoesNotExist: id21
+                LoyaltyDoesNotExist: loyaltyId1
             });
         }
         const loyalty1 = loyaltyOpt1.Some;
-        loyalties.remove(id21);
+        loyalties.remove(loyaltyId1);
         return Ok(loyalty1);
     }),
     clearLoyalty: update([
         nat64,
         Principal3,
         text
-    ], Result(Loyalty, Errors), (loyaltyId1, userId1, merchantId1)=>{
+    ], Result(Loyalty, Errors), (loyaltyId1)=>{
         const loyaltyOpt1 = loyalties.get(loyaltyId1);
         if ("None" in loyaltyOpt1) {
             return Err({
@@ -100848,13 +100839,30 @@ var backend_default = Canister({
         loyalty1.claimed = true;
         const newLoyalty1 = {
             id: loyaltyCounter,
+            transactions: 0n,
             claimed: false,
-            userId: userId1,
-            merchantId: merchantId1,
+            userId: loyalty1.userId,
+            merchantId: loyalty1.merchantId,
             createdAt: ic.time()
         };
         loyalties.insert(newLoyalty1.id, newLoyalty1);
         loyaltyCounter++;
+        return Ok(loyalty1);
+    }),
+    addTransaction: update([
+        nat64
+    ], Result(Loyalty, Errors), (loyaltyId1)=>{
+        const loyaltyOpt1 = loyalties.get(loyaltyId1);
+        if ("None" in loyaltyOpt1) {
+            return Err({
+                LoyaltyDoesNotExist: loyaltyId1
+            });
+        }
+        const loyalty1 = loyaltyOpt1.Some;
+        const updatedLoyalty1 = _extends({}, loyalty1, {
+            transactions: loyalty1.transactions++
+        });
+        loyalties.insert(updatedLoyalty1.id, updatedLoyalty1);
         return Ok(loyalty1);
     }),
     queryLoyalty: update([

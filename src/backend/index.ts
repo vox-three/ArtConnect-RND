@@ -43,9 +43,9 @@ let loyalties = StableBTreeMap(nat64, Loyalty, 4);
 
 export default Canister({
     /* ---------------------------------- Users --------------------------------- */
-    createUser: update([Principal], User, (id) => {
+    createUser: update([], User, () => {
         const user: typeof User = {
-            id,
+            id: ic.caller(),
             createdAt: ic.time(),
         };
 
@@ -55,8 +55,8 @@ export default Canister({
     readAllUsers: query([], Vec(User), () => {
         return users.values();
     }),
-    readUser: query([Principal], Opt(User), (id) => {
-        return users.get(id);
+    readUser: query([], Opt(User), () => {
+        return users.get(ic.caller());
     }),
     deleteUser: update([Principal], Result(User, Errors), (id) => {
         const userOpts = users.get(id);
@@ -173,7 +173,6 @@ export default Canister({
                 metadataUrl,
                 userId: creator.id,
                 creatorId,
-                loyaltyId: 0n,
                 createdAt: ic.time(),
             };
 
@@ -204,7 +203,7 @@ export default Canister({
         nfts.remove(nft.id);
         return Ok(nft);
     }),
-    sendNft: update([nat64, Principal, nat64], Result(Nft, Errors), (nftId, userId, loyaltyId) => {
+    sendNft: update([nat64], Result(Nft, Errors), (nftId) => {
         // Find NFT
         const nftOpts = nfts.get(nftId);
 
@@ -215,20 +214,20 @@ export default Canister({
         }
 
         const nft = nftOpts.Some;
+        const userId = ic.caller();
 
         const updatedNft: typeof Nft = {
             ...nft,
             userId,
-            loyaltyId,
         };
 
         nfts.insert(updatedNft.id, updatedNft);
 
         return Ok(nft);
     }),
-    queryUserNft: query([Principal], Vec(Nft), (userId) => {
+    queryUserNft: query([], Vec(Nft), () => {
         return nfts.values().filter((nft) => {
-            nft.userId.toText() === userId.toText();
+            nft.userId.toText() === ic.caller().toText();
         });
     }),
     queryCreatorNft: query([Principal], Vec(Nft), (creatorId) => {
@@ -242,11 +241,12 @@ export default Canister({
         });
     }),
     /* --------------------------------- Loyalty -------------------------------- */
-    createLoyalty: update([Principal, text], Loyalty, (userId, merchantId) => {
+    createLoyalty: update([text], Loyalty, (merchantId) => {
         const loyalty: typeof Loyalty = {
             id: loyaltyCounter,
+            transactions: 0n,
             claimed: false,
-            userId,
+            userId: ic.caller(),
             merchantId,
             createdAt: ic.time(),
         };
@@ -262,54 +262,72 @@ export default Canister({
     readLoyalty: query([nat64], Opt(Loyalty), (loyaltyId) => {
         return loyalties.get(loyaltyId);
     }),
-    deleteLoyalty: update([nat64], Result(Loyalty, Errors), (id) => {
+    deleteLoyalty: update([nat64], Result(Loyalty, Errors), (loyaltyId) => {
         // Find the loyalty record
-        const loyaltyOpt = loyalties.get(id);
+        const loyaltyOpt = loyalties.get(loyaltyId);
 
         if ("None" in loyaltyOpt) {
             return Err({
-                LoyaltyDoesNotExist: id,
+                LoyaltyDoesNotExist: loyaltyId,
             });
         }
 
         const loyalty = loyaltyOpt.Some;
 
         // Remove loyalty
-        loyalties.remove(id);
+        loyalties.remove(loyaltyId);
 
         return Ok(loyalty);
     }),
-    clearLoyalty: update(
-        [nat64, Principal, text],
-        Result(Loyalty, Errors),
-        (loyaltyId, userId, merchantId) => {
-            // Change claimed status to true
-            const loyaltyOpt = loyalties.get(loyaltyId);
+    clearLoyalty: update([nat64, Principal, text], Result(Loyalty, Errors), (loyaltyId) => {
+        // Change claimed status to true
+        const loyaltyOpt = loyalties.get(loyaltyId);
 
-            if ("None" in loyaltyOpt) {
-                return Err({
-                    LoyaltyDoesNotExist: loyaltyId,
-                });
-            }
-
-            const loyalty = loyaltyOpt.Some;
-            loyalty.claimed = true;
-
-            // Create new and assign new loyalty to user and merchant
-            const newLoyalty: typeof Loyalty = {
-                id: loyaltyCounter,
-                claimed: false,
-                userId,
-                merchantId,
-                createdAt: ic.time(),
-            };
-
-            loyalties.insert(newLoyalty.id, newLoyalty);
-            loyaltyCounter++;
-
-            return Ok(loyalty);
+        if ("None" in loyaltyOpt) {
+            return Err({
+                LoyaltyDoesNotExist: loyaltyId,
+            });
         }
-    ),
+
+        const loyalty = loyaltyOpt.Some;
+        loyalty.claimed = true;
+
+        // Create new and assign new loyalty to user and merchant
+        const newLoyalty: typeof Loyalty = {
+            id: loyaltyCounter,
+            transactions: 0n,
+            claimed: false,
+            userId: loyalty.userId,
+            merchantId: loyalty.merchantId,
+            createdAt: ic.time(),
+        };
+
+        loyalties.insert(newLoyalty.id, newLoyalty);
+        loyaltyCounter++;
+
+        return Ok(loyalty);
+    }),
+    addTransaction: update([nat64], Result(Loyalty, Errors), (loyaltyId) => {
+        // Change claimed status to true
+        const loyaltyOpt = loyalties.get(loyaltyId);
+
+        if ("None" in loyaltyOpt) {
+            return Err({
+                LoyaltyDoesNotExist: loyaltyId,
+            });
+        }
+
+        const loyalty = loyaltyOpt.Some;
+
+        const updatedLoyalty: typeof Loyalty = {
+            ...loyalty,
+            transactions: loyalty.transactions++,
+        };
+
+        loyalties.insert(updatedLoyalty.id, updatedLoyalty);
+
+        return Ok(loyalty);
+    }),
     queryLoyalty: update([Principal, text], Vec(Loyalty), (userId, merchantId) => {
         return loyalties.values().filter((loyalty) => {
             loyalty.userId.toText() === userId.toText() && loyalty.merchantId === merchantId;

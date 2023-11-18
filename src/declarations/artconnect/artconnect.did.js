@@ -1,13 +1,63 @@
 export const idlFactory = ({ IDL }) => {
   return IDL.Service({
+    'addTransaction' : IDL.Func(
+        [IDL.Nat64],
+        [
+          IDL.Variant({
+            'Ok' : IDL.Record({
+              'id' : IDL.Nat64,
+              'userId' : IDL.Principal,
+              'createdAt' : IDL.Nat64,
+              'merchantId' : IDL.Text,
+              'claimed' : IDL.Bool,
+              'transactions' : IDL.Nat64,
+            }),
+            'Err' : IDL.Variant({
+              'MerchantDoesNotExist' : IDL.Text,
+              'SlotDoesNotExist' : IDL.Nat64,
+              'NftDoesNotExist' : IDL.Nat64,
+              'CreatorDoesNotExist' : IDL.Principal,
+              'LoyaltyDoesNotExist' : IDL.Nat64,
+              'UserDoesNotExist' : IDL.Principal,
+            }),
+          }),
+        ],
+        [],
+      ),
+    'clearLoyalty' : IDL.Func(
+        [IDL.Nat64, IDL.Principal, IDL.Text],
+        [
+          IDL.Variant({
+            'Ok' : IDL.Record({
+              'id' : IDL.Nat64,
+              'userId' : IDL.Principal,
+              'createdAt' : IDL.Nat64,
+              'merchantId' : IDL.Text,
+              'claimed' : IDL.Bool,
+              'transactions' : IDL.Nat64,
+            }),
+            'Err' : IDL.Variant({
+              'MerchantDoesNotExist' : IDL.Text,
+              'SlotDoesNotExist' : IDL.Nat64,
+              'NftDoesNotExist' : IDL.Nat64,
+              'CreatorDoesNotExist' : IDL.Principal,
+              'LoyaltyDoesNotExist' : IDL.Nat64,
+              'UserDoesNotExist' : IDL.Principal,
+            }),
+          }),
+        ],
+        [],
+      ),
     'createCreator' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
         [
           IDL.Record({
             'id' : IDL.Principal,
-            'nftIds' : IDL.Vec(IDL.Nat64),
+            'province' : IDL.Text,
             'flickr' : IDL.Text,
+            'city' : IDL.Text,
             'instagram' : IDL.Text,
+            'name' : IDL.Text,
             'createdAt' : IDL.Nat64,
             'behance' : IDL.Text,
             'reddit' : IDL.Text,
@@ -15,33 +65,8 @@ export const idlFactory = ({ IDL }) => {
         ],
         [],
       ),
-    'createMerchant' : IDL.Func(
-        [],
-        [
-          IDL.Record({
-            'slotIds' : IDL.Vec(IDL.Nat64),
-            'collabCreators' : IDL.Vec(IDL.Principal),
-            'createdAt' : IDL.Nat64,
-            'uuid' : IDL.Text,
-          }),
-        ],
-        [],
-      ),
-    'createNft' : IDL.Func(
-        [IDL.Principal, IDL.Text, IDL.Text],
-        [
-          IDL.Record({
-            'id' : IDL.Nat64,
-            'imageMetadata' : IDL.Text,
-            'createdAt' : IDL.Nat64,
-            'creatorId' : IDL.Principal,
-            'imageUrl' : IDL.Text,
-          }),
-        ],
-        [],
-      ),
-    'createSlot' : IDL.Func(
-        [IDL.Nat64, IDL.Principal, IDL.Text, IDL.Nat64],
+    'createLoyalty' : IDL.Func(
+        [IDL.Text],
         [
           IDL.Record({
             'id' : IDL.Nat64,
@@ -49,21 +74,52 @@ export const idlFactory = ({ IDL }) => {
             'createdAt' : IDL.Nat64,
             'merchantId' : IDL.Text,
             'claimed' : IDL.Bool,
-            'nftId' : IDL.Nat64,
+            'transactions' : IDL.Nat64,
+          }),
+        ],
+        [],
+      ),
+    'createMerchant' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text],
+        [
+          IDL.Record({
+            'lat' : IDL.Text,
+            'lon' : IDL.Text,
+            'name' : IDL.Text,
+            'createdAt' : IDL.Nat64,
+            'uuid' : IDL.Text,
+            'collaborations' : IDL.Vec(IDL.Principal),
+          }),
+        ],
+        [],
+      ),
+    'createNft' : IDL.Func(
+        [IDL.Principal, IDL.Text, IDL.Text],
+        [
+          IDL.Variant({
+            'Ok' : IDL.Record({
+              'id' : IDL.Nat64,
+              'metadataUrl' : IDL.Text,
+              'userId' : IDL.Principal,
+              'createdAt' : IDL.Nat64,
+              'creatorId' : IDL.Principal,
+              'imageUrl' : IDL.Text,
+            }),
+            'Err' : IDL.Variant({
+              'MerchantDoesNotExist' : IDL.Text,
+              'SlotDoesNotExist' : IDL.Nat64,
+              'NftDoesNotExist' : IDL.Nat64,
+              'CreatorDoesNotExist' : IDL.Principal,
+              'LoyaltyDoesNotExist' : IDL.Nat64,
+              'UserDoesNotExist' : IDL.Principal,
+            }),
           }),
         ],
         [],
       ),
     'createUser' : IDL.Func(
-        [IDL.Principal],
-        [
-          IDL.Record({
-            'id' : IDL.Principal,
-            'nftIds' : IDL.Vec(IDL.Nat64),
-            'slotIds' : IDL.Vec(IDL.Nat64),
-            'createdAt' : IDL.Nat64,
-          }),
-        ],
+        [],
+        [IDL.Record({ 'id' : IDL.Principal, 'createdAt' : IDL.Nat64 })],
         [],
       ),
     'deleteCreator' : IDL.Func(
@@ -72,9 +128,11 @@ export const idlFactory = ({ IDL }) => {
           IDL.Variant({
             'Ok' : IDL.Record({
               'id' : IDL.Principal,
-              'nftIds' : IDL.Vec(IDL.Nat64),
+              'province' : IDL.Text,
               'flickr' : IDL.Text,
+              'city' : IDL.Text,
               'instagram' : IDL.Text,
+              'name' : IDL.Text,
               'createdAt' : IDL.Nat64,
               'behance' : IDL.Text,
               'reddit' : IDL.Text,
@@ -84,6 +142,31 @@ export const idlFactory = ({ IDL }) => {
               'SlotDoesNotExist' : IDL.Nat64,
               'NftDoesNotExist' : IDL.Nat64,
               'CreatorDoesNotExist' : IDL.Principal,
+              'LoyaltyDoesNotExist' : IDL.Nat64,
+              'UserDoesNotExist' : IDL.Principal,
+            }),
+          }),
+        ],
+        [],
+      ),
+    'deleteLoyalty' : IDL.Func(
+        [IDL.Nat64],
+        [
+          IDL.Variant({
+            'Ok' : IDL.Record({
+              'id' : IDL.Nat64,
+              'userId' : IDL.Principal,
+              'createdAt' : IDL.Nat64,
+              'merchantId' : IDL.Text,
+              'claimed' : IDL.Bool,
+              'transactions' : IDL.Nat64,
+            }),
+            'Err' : IDL.Variant({
+              'MerchantDoesNotExist' : IDL.Text,
+              'SlotDoesNotExist' : IDL.Nat64,
+              'NftDoesNotExist' : IDL.Nat64,
+              'CreatorDoesNotExist' : IDL.Principal,
+              'LoyaltyDoesNotExist' : IDL.Nat64,
               'UserDoesNotExist' : IDL.Principal,
             }),
           }),
@@ -95,16 +178,19 @@ export const idlFactory = ({ IDL }) => {
         [
           IDL.Variant({
             'Ok' : IDL.Record({
-              'slotIds' : IDL.Vec(IDL.Nat64),
-              'collabCreators' : IDL.Vec(IDL.Principal),
+              'lat' : IDL.Text,
+              'lon' : IDL.Text,
+              'name' : IDL.Text,
               'createdAt' : IDL.Nat64,
               'uuid' : IDL.Text,
+              'collaborations' : IDL.Vec(IDL.Principal),
             }),
             'Err' : IDL.Variant({
               'MerchantDoesNotExist' : IDL.Text,
               'SlotDoesNotExist' : IDL.Nat64,
               'NftDoesNotExist' : IDL.Nat64,
               'CreatorDoesNotExist' : IDL.Principal,
+              'LoyaltyDoesNotExist' : IDL.Nat64,
               'UserDoesNotExist' : IDL.Principal,
             }),
           }),
@@ -117,7 +203,8 @@ export const idlFactory = ({ IDL }) => {
           IDL.Variant({
             'Ok' : IDL.Record({
               'id' : IDL.Nat64,
-              'imageMetadata' : IDL.Text,
+              'metadataUrl' : IDL.Text,
+              'userId' : IDL.Principal,
               'createdAt' : IDL.Nat64,
               'creatorId' : IDL.Principal,
               'imageUrl' : IDL.Text,
@@ -127,29 +214,7 @@ export const idlFactory = ({ IDL }) => {
               'SlotDoesNotExist' : IDL.Nat64,
               'NftDoesNotExist' : IDL.Nat64,
               'CreatorDoesNotExist' : IDL.Principal,
-              'UserDoesNotExist' : IDL.Principal,
-            }),
-          }),
-        ],
-        [],
-      ),
-    'deleteSlot' : IDL.Func(
-        [IDL.Nat64],
-        [
-          IDL.Variant({
-            'Ok' : IDL.Record({
-              'id' : IDL.Nat64,
-              'userId' : IDL.Principal,
-              'createdAt' : IDL.Nat64,
-              'merchantId' : IDL.Text,
-              'claimed' : IDL.Bool,
-              'nftId' : IDL.Nat64,
-            }),
-            'Err' : IDL.Variant({
-              'MerchantDoesNotExist' : IDL.Text,
-              'SlotDoesNotExist' : IDL.Nat64,
-              'NftDoesNotExist' : IDL.Nat64,
-              'CreatorDoesNotExist' : IDL.Principal,
+              'LoyaltyDoesNotExist' : IDL.Nat64,
               'UserDoesNotExist' : IDL.Principal,
             }),
           }),
@@ -162,8 +227,6 @@ export const idlFactory = ({ IDL }) => {
           IDL.Variant({
             'Ok' : IDL.Record({
               'id' : IDL.Principal,
-              'nftIds' : IDL.Vec(IDL.Nat64),
-              'slotIds' : IDL.Vec(IDL.Nat64),
               'createdAt' : IDL.Nat64,
             }),
             'Err' : IDL.Variant({
@@ -171,11 +234,76 @@ export const idlFactory = ({ IDL }) => {
               'SlotDoesNotExist' : IDL.Nat64,
               'NftDoesNotExist' : IDL.Nat64,
               'CreatorDoesNotExist' : IDL.Principal,
+              'LoyaltyDoesNotExist' : IDL.Nat64,
               'UserDoesNotExist' : IDL.Principal,
             }),
           }),
         ],
         [],
+      ),
+    'queryCreatorNft' : IDL.Func(
+        [IDL.Principal],
+        [
+          IDL.Vec(
+            IDL.Record({
+              'id' : IDL.Nat64,
+              'metadataUrl' : IDL.Text,
+              'userId' : IDL.Principal,
+              'createdAt' : IDL.Nat64,
+              'creatorId' : IDL.Principal,
+              'imageUrl' : IDL.Text,
+            })
+          ),
+        ],
+        ['query'],
+      ),
+    'queryLoyalty' : IDL.Func(
+        [IDL.Principal, IDL.Text],
+        [
+          IDL.Vec(
+            IDL.Record({
+              'id' : IDL.Nat64,
+              'userId' : IDL.Principal,
+              'createdAt' : IDL.Nat64,
+              'merchantId' : IDL.Text,
+              'claimed' : IDL.Bool,
+              'transactions' : IDL.Nat64,
+            })
+          ),
+        ],
+        [],
+      ),
+    'queryLoyaltyNft' : IDL.Func(
+        [IDL.Nat64],
+        [
+          IDL.Vec(
+            IDL.Record({
+              'id' : IDL.Nat64,
+              'metadataUrl' : IDL.Text,
+              'userId' : IDL.Principal,
+              'createdAt' : IDL.Nat64,
+              'creatorId' : IDL.Principal,
+              'imageUrl' : IDL.Text,
+            })
+          ),
+        ],
+        ['query'],
+      ),
+    'queryUserNft' : IDL.Func(
+        [],
+        [
+          IDL.Vec(
+            IDL.Record({
+              'id' : IDL.Nat64,
+              'metadataUrl' : IDL.Text,
+              'userId' : IDL.Principal,
+              'createdAt' : IDL.Nat64,
+              'creatorId' : IDL.Principal,
+              'imageUrl' : IDL.Text,
+            })
+          ),
+        ],
+        ['query'],
       ),
     'readAllCreators' : IDL.Func(
         [],
@@ -183,12 +311,30 @@ export const idlFactory = ({ IDL }) => {
           IDL.Vec(
             IDL.Record({
               'id' : IDL.Principal,
-              'nftIds' : IDL.Vec(IDL.Nat64),
+              'province' : IDL.Text,
               'flickr' : IDL.Text,
+              'city' : IDL.Text,
               'instagram' : IDL.Text,
+              'name' : IDL.Text,
               'createdAt' : IDL.Nat64,
               'behance' : IDL.Text,
               'reddit' : IDL.Text,
+            })
+          ),
+        ],
+        ['query'],
+      ),
+    'readAllLoyalties' : IDL.Func(
+        [],
+        [
+          IDL.Vec(
+            IDL.Record({
+              'id' : IDL.Nat64,
+              'userId' : IDL.Principal,
+              'createdAt' : IDL.Nat64,
+              'merchantId' : IDL.Text,
+              'claimed' : IDL.Bool,
+              'transactions' : IDL.Nat64,
             })
           ),
         ],
@@ -199,10 +345,12 @@ export const idlFactory = ({ IDL }) => {
         [
           IDL.Vec(
             IDL.Record({
-              'slotIds' : IDL.Vec(IDL.Nat64),
-              'collabCreators' : IDL.Vec(IDL.Principal),
+              'lat' : IDL.Text,
+              'lon' : IDL.Text,
+              'name' : IDL.Text,
               'createdAt' : IDL.Nat64,
               'uuid' : IDL.Text,
+              'collaborations' : IDL.Vec(IDL.Principal),
             })
           ),
         ],
@@ -214,26 +362,11 @@ export const idlFactory = ({ IDL }) => {
           IDL.Vec(
             IDL.Record({
               'id' : IDL.Nat64,
-              'imageMetadata' : IDL.Text,
+              'metadataUrl' : IDL.Text,
+              'userId' : IDL.Principal,
               'createdAt' : IDL.Nat64,
               'creatorId' : IDL.Principal,
               'imageUrl' : IDL.Text,
-            })
-          ),
-        ],
-        ['query'],
-      ),
-    'readAllSlots' : IDL.Func(
-        [],
-        [
-          IDL.Vec(
-            IDL.Record({
-              'id' : IDL.Nat64,
-              'userId' : IDL.Principal,
-              'createdAt' : IDL.Nat64,
-              'merchantId' : IDL.Text,
-              'claimed' : IDL.Bool,
-              'nftId' : IDL.Nat64,
             })
           ),
         ],
@@ -243,12 +376,7 @@ export const idlFactory = ({ IDL }) => {
         [],
         [
           IDL.Vec(
-            IDL.Record({
-              'id' : IDL.Principal,
-              'nftIds' : IDL.Vec(IDL.Nat64),
-              'slotIds' : IDL.Vec(IDL.Nat64),
-              'createdAt' : IDL.Nat64,
-            })
+            IDL.Record({ 'id' : IDL.Principal, 'createdAt' : IDL.Nat64 })
           ),
         ],
         ['query'],
@@ -259,12 +387,30 @@ export const idlFactory = ({ IDL }) => {
           IDL.Opt(
             IDL.Record({
               'id' : IDL.Principal,
-              'nftIds' : IDL.Vec(IDL.Nat64),
+              'province' : IDL.Text,
               'flickr' : IDL.Text,
+              'city' : IDL.Text,
               'instagram' : IDL.Text,
+              'name' : IDL.Text,
               'createdAt' : IDL.Nat64,
               'behance' : IDL.Text,
               'reddit' : IDL.Text,
+            })
+          ),
+        ],
+        ['query'],
+      ),
+    'readLoyalty' : IDL.Func(
+        [IDL.Nat64],
+        [
+          IDL.Opt(
+            IDL.Record({
+              'id' : IDL.Nat64,
+              'userId' : IDL.Principal,
+              'createdAt' : IDL.Nat64,
+              'merchantId' : IDL.Text,
+              'claimed' : IDL.Bool,
+              'transactions' : IDL.Nat64,
             })
           ),
         ],
@@ -275,10 +421,12 @@ export const idlFactory = ({ IDL }) => {
         [
           IDL.Opt(
             IDL.Record({
-              'slotIds' : IDL.Vec(IDL.Nat64),
-              'collabCreators' : IDL.Vec(IDL.Principal),
+              'lat' : IDL.Text,
+              'lon' : IDL.Text,
+              'name' : IDL.Text,
               'createdAt' : IDL.Nat64,
               'uuid' : IDL.Text,
+              'collaborations' : IDL.Vec(IDL.Principal),
             })
           ),
         ],
@@ -290,7 +438,8 @@ export const idlFactory = ({ IDL }) => {
           IDL.Opt(
             IDL.Record({
               'id' : IDL.Nat64,
-              'imageMetadata' : IDL.Text,
+              'metadataUrl' : IDL.Text,
+              'userId' : IDL.Principal,
               'createdAt' : IDL.Nat64,
               'creatorId' : IDL.Principal,
               'imageUrl' : IDL.Text,
@@ -299,35 +448,38 @@ export const idlFactory = ({ IDL }) => {
         ],
         ['query'],
       ),
-    'readSlot' : IDL.Func(
-        [IDL.Nat64],
+    'readUser' : IDL.Func(
+        [],
         [
           IDL.Opt(
-            IDL.Record({
-              'id' : IDL.Nat64,
-              'userId' : IDL.Principal,
-              'createdAt' : IDL.Nat64,
-              'merchantId' : IDL.Text,
-              'claimed' : IDL.Bool,
-              'nftId' : IDL.Nat64,
-            })
+            IDL.Record({ 'id' : IDL.Principal, 'createdAt' : IDL.Nat64 })
           ),
         ],
         ['query'],
       ),
-    'readUser' : IDL.Func(
-        [IDL.Principal],
+    'sendNft' : IDL.Func(
+        [IDL.Nat64],
         [
-          IDL.Opt(
-            IDL.Record({
-              'id' : IDL.Principal,
-              'nftIds' : IDL.Vec(IDL.Nat64),
-              'slotIds' : IDL.Vec(IDL.Nat64),
+          IDL.Variant({
+            'Ok' : IDL.Record({
+              'id' : IDL.Nat64,
+              'metadataUrl' : IDL.Text,
+              'userId' : IDL.Principal,
               'createdAt' : IDL.Nat64,
-            })
-          ),
+              'creatorId' : IDL.Principal,
+              'imageUrl' : IDL.Text,
+            }),
+            'Err' : IDL.Variant({
+              'MerchantDoesNotExist' : IDL.Text,
+              'SlotDoesNotExist' : IDL.Nat64,
+              'NftDoesNotExist' : IDL.Nat64,
+              'CreatorDoesNotExist' : IDL.Principal,
+              'LoyaltyDoesNotExist' : IDL.Nat64,
+              'UserDoesNotExist' : IDL.Principal,
+            }),
+          }),
         ],
-        ['query'],
+        [],
       ),
   });
 };

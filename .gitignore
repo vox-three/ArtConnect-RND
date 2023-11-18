@@ -5,3 +5,8 @@ dist-ssr
 *.local
 .dfx
 .env
+
+# icp specifics
+.azle
+.dfx
+src/declarations

@@ -31,11 +31,11 @@ const Nft = Record({
     metadataUrl: text,
     userId: Principal,
     creatorId: Principal,
-    loyaltyId: nat64,
     createdAt: nat64,
 });
 const Loyalty = Record({
     id: nat64,
+    transactions: nat64,
     claimed: bool,
     userId: Principal,
     merchantId: text,
