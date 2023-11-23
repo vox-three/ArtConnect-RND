@@ -26,7 +26,7 @@ const ImageDetailPage = () => {
     };
 
     const shareUrl = state.imgurl;
-    const title = 'Share NFT, ';
+    const title = 'Check out this amazing artwork I received, ';
 
     return (
         <>
