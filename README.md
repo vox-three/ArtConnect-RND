@@ -13,8 +13,6 @@
 
 - [Troubleshooting](#troubleshooting)
 
-- [Security Considerations](#security-considerations)
-
 - [Support and Contact Information](#support-and-contact-information)
 
 ### Introduction
