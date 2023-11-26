@@ -7,8 +7,6 @@
 
 - [Getting started](#getting-started)
 
-- [Configuration](#configuration)
-
 - [Usage Guide](#usage-guide)
 
 - [API Documentation](#api-documentation)
