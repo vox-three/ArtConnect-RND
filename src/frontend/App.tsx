@@ -36,6 +36,11 @@ import CustomerDashboard from "./pages/CustomerDashboard";
 import ClaimPage from "./pages/Claim";
 import BottomBar from "./components/BottomBar";
 import TransactionList from "./pages/TransactionList";
+import UserDashboard from "./pages/UserDashboard";
+import MarketPlace from "./pages/NFTMartketPlace";
+import Collection from "./pages/Collection";
+import ArtistDirectory from "./pages/ArtistDirectory";
+import ArtistProfile from "./pages/ArtistProfile";
 
 const router = createBrowserRouter([
     {
@@ -69,6 +74,26 @@ const router = createBrowserRouter([
     {
         path: "/transactionlistpage",
         element: <TransactionList />,
+    },
+    {
+        path: "/userdashboard",
+        element: <UserDashboard />,
+    },
+    {
+        path: "/marketplace",
+        element: <MarketPlace />,
+    },
+    {
+        path: "/collection",
+        element: <Collection />,
+    },
+    {
+        path: "/artistdirectory",
+        element: <ArtistDirectory />,
+    },
+    {
+        path: "/artistprofile",
+        element: <ArtistProfile />,
     },
 ]);
 

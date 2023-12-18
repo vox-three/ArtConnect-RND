@@ -5,6 +5,7 @@ import { BottomNavigation, BottomNavigationAction } from "@mui/material";
 import ImageIcon from "@mui/icons-material/Image"; // Ikon gambar dari MUI
 import CropFreeIcon from '@mui/icons-material/CropFree';
 import GradeIcon from '@mui/icons-material/Grade';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useNavigate, Link, useLocation } from "react-router-dom";
 
 const BottomBar = () => {
@@ -43,6 +44,14 @@ const BottomBar = () => {
                 component={Link}
                 to="/transactionlistpage"
                 value="/transactionlistpage"
+            />
+             <BottomNavigationAction
+                className="hover-bottom-navigation"
+                label="Market"
+                icon={<ShoppingCartIcon style={{ color: "orange" }} />}
+                component={Link}
+                to="/marketplace"
+                value="/marketplace"
             />
         </BottomNavigation>
     );
