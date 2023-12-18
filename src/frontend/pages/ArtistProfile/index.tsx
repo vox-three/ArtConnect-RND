@@ -48,7 +48,7 @@ const ArtistProfile = () => {
                                     </div>
                                 </Grid>
                                 <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
-                                    <p style={{ fontSize: '24px', fontWeight:'bold' }}>Poppy Lessart</p>
+                                    <p style={{ fontSize: '24px', fontWeight:'bold' }}>Poppy Lesart</p>
                                 </Grid>
                                 <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
                                     <div style={{ width: '100%', height: 'auto', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginBottom:'20px' }}>
