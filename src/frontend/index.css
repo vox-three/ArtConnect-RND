@@ -11,6 +11,8 @@ body {
     margin: 0 auto;
 }
 
+
+
 button {
     font-weight: 600;
 }
@@ -90,7 +92,7 @@ button {
     width: 200px !important;
     height: 50px !important;
     color: white !important;
-    margin-top: 20px !important;
+    margin-top: 10px !important;
 }
 
 .scan-dummy{
@@ -143,6 +145,7 @@ button {
     width: 200px;
     height: 200px;
     background-color: black;
+    margin-top: -10px;
 }
 
 .wrap-image-scan img{
@@ -154,6 +157,7 @@ button {
 /* -------------------------------- Image Detail Page ------------------------------- */
 .imagedetail-page {
     height: 100vh;
+    padding-bottom: 150px;
 }
 
 .button-share{
@@ -217,6 +221,63 @@ button {
     background-color: #F3DAC6 !important;
     color: #F5E2D3 !important;
 }
+
+.product--image {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+  }
+  
+  .card {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    width: 170px;
+    height: auto;
+    background-color: white;
+    margin: 0px auto;
+    line-height: 2;
+  }
+
+  .card-collection {
+    width: 170px;
+    height: auto;
+    background-color: white;
+    border: 4px solid #e3e3e3;
+    border-radius: 10px;
+    margin: 0px auto;
+    line-height: 2;
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: start;
+    flex-direction: column;
+  }
+  
+  .price {
+    color: grey;
+    font-size: 22px;
+  }
+  
+  .card button {
+    border: none;
+    outline: 0;
+    padding: 12px;
+    color: white;
+    background-color: #E8833A;
+    text-align: center;
+    cursor: pointer;
+    width: 100%;
+    font-size: 18px;
+  }
+  
+  .card button:hover {
+    opacity: 0.7;
+  }
+
+  .marketplace-page {
+     height: 100vh;
+     padding-bottom: 200px;
+   }
+
+   
 
 
 

@@ -45,8 +45,9 @@ const ImageAfterScan = () => {
                     <Grid
                         item
                         xs={12}
-                        style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
+                        style={{ display: "flex", justifyContent: "center", alignItems:'center', marginTop: "20px", flexDirection:'column' }}
                     >
+                        <p style={{ fontWeight:'bold', fontSize:'24px' }}>#213</p>
                         <div className="wrap-image-scan">
                             {/* <img src={location.state?.url} alt="" /> */}
                             <LazyLoadImage src={location.state.url} alt="NFT image" />

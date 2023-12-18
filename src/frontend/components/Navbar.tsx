@@ -28,10 +28,10 @@ const Navbar = () => {
         },
     });
 
-    // const navigate = useNavigate();
-    // const redirectScan = () => {
-    //     navigate("/scan");
-    // };
+    const navigateuser = useNavigate();
+    const redirectUser = () => {
+        navigateuser("/userdashboard");
+    };
 
     // const navigateHome = useNavigate();
     // const redirectHome = () => {
@@ -66,6 +66,7 @@ const Navbar = () => {
                 </IconButton>
                 <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
                     <MenuItem onClick={disconnect}>Log Out</MenuItem>
+                    <MenuItem onClick={redirectUser} >Dashboard</MenuItem>
                 </Menu>
             </Toolbar>
         </AppBar>
