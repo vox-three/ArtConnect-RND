@@ -1,16 +1,20 @@
 {
     "canisters": {
         "artconnect": {
-            "type": "custom",
-            "main": "src/backend/index.ts",
-            "candid": "src/backend/index.did",
-            "build": "npx azle artconnect",
-            "wasm": ".azle/artconnect/artconnect.wasm",
-            "gzip": true,
-            "declarations": {
-                "node_compatibility": true,
-                "env_override": ""
-            }
+            "type": "motoko",
+            "main": "src/backend/Index.mo"
+        },
+        "nft": {
+            "type": "motoko",
+            "main": "src/backend/NFT.mo"
+        },
+        "merchant": {
+            "type": "motoko",
+            "main": "src/backend/Merchant.mo"
+        },
+        "artist": {
+            "type": "motoko",
+            "main": "src/backend/Artist.mo"
         },
         "assets": {
             "dependencies": ["artconnect"],
