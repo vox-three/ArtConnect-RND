@@ -12,8 +12,9 @@ actor ArtConnect {
     private type Transaction = {
         merchant : Principal;
         transactions : Nat8;
-        claimed : Bool;
     };
+
+    let maxTransaction : Nat8 = 10;
 
     var mapOfArtists = HashMap.HashMap<Principal, ArtistActorClass.Artist>(1, Principal.equal, Principal.hash);
     var mapOfMerchants = HashMap.HashMap<Principal, MerchantActorClass.Merchant>(1, Principal.equal, Principal.hash);
@@ -39,6 +40,14 @@ actor ArtConnect {
         return newMerchantPrincipal;
     };
 
+    public query func getArtistDetails(artistId : Principal) : async ?ArtistActorClass.Artist {
+        return mapOfArtists.get(artistId);
+    };
+
+    public query func getMerchantDetails(merchantId : Principal) : async ?MerchantActorClass.Merchant {
+        return mapOfMerchants.get(merchantId);
+    };
+
     public shared (msg) func addCollaboration(merchant : Principal, artist : Principal) : async () {
         var collab : List.List<Principal> = switch (mapOfCollaborations.get(merchant)) {
             case null List.nil<Principal>();
@@ -49,7 +58,16 @@ actor ArtConnect {
         mapOfCollaborations.put(merchant, collab);
     };
 
+    public query func listCollaborations(merchantId : Principal) : async [Principal] {
+        switch (mapOfCollaborations.get(merchantId)) {
+            case (null)[];
+            case (?collabList) List.toArray(collabList);
+        };
+    };
+
     public shared (msg) func addTransaction(user : Principal, merchant : Principal) : async () {
+        // Define the maximum number of transactions allowed before stopping increments
+
         // Get or create the merchant transaction map for this user
         let merchantTransactions = switch (userTransactions.get(user)) {
             case (null) {
@@ -68,11 +86,15 @@ actor ArtConnect {
             case (?existingTransaction) existingTransaction;
         };
 
-        // Increment the transaction count
-        let updatedTransaction = {
-            merchant = currentTransaction.merchant;
-            transactions = currentTransaction.transactions + 1 : Nat8;
-            claimed = currentTransaction.claimed;
+        // Only increment the transaction count if it's below the maxTransactions
+        let updatedTransaction : Transaction = if (currentTransaction.transactions < maxTransaction) {
+            {
+                merchant = currentTransaction.merchant;
+                transactions = currentTransaction.transactions + 1 : Nat8;
+            };
+        } else {
+            // If the transaction count has reached the maximum, do not increment
+            currentTransaction;
         };
 
         // Update the merchant transaction map for this user
@@ -83,4 +105,49 @@ actor ArtConnect {
     };
 
     // Additional functions or logic can be added here
+    public shared (msg) func claimReward(user : Principal, merchant : Principal) : async Bool {
+        // Define the number of transactions required to claim a reward
+
+        // Retrieve the user's transactions with the specified merchant
+        let userMerchantTransactions = switch (userTransactions.get(user)) {
+            case (null) null;
+            case (?transactions) transactions.get(merchant);
+        };
+
+        switch (userTransactions.get(user)) {
+            case (null) {
+                // Handle the case where there is no transaction map for the user
+                // Possibly return an error or false
+                false;
+            };
+            case (?merchantTransactions) {
+                switch (merchantTransactions.get(merchant)) {
+                    case (null) {
+                        // Handle the case where there is no transaction record for the merchant
+                        // Possibly return an error or false
+                        false;
+                    };
+                    case (?transaction) {
+                        if (transaction.transactions == maxTransaction) {
+                            // Update the transaction to mark the reward as claimed
+                            let updatedTransaction = {
+                                merchant = transaction.merchant;
+                                transactions = 0 : Nat8; // Resetting the transaction count
+                            };
+                            // Update the transaction record
+                            merchantTransactions.put(merchant, updatedTransaction);
+                            // Update the user transaction map with the new merchant transaction map
+                            userTransactions.put(user, merchantTransactions);
+                            true; // Reward claimed successfully
+                        } else {
+                            // Criteria not met or reward already claimed
+                            false;
+                        };
+                    };
+                };
+            };
+        };
+
+    };
+
 };
